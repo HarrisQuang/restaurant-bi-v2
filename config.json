@@ -1,0 +1,30 @@
+{
+    "data_source": [
+        {
+            "no": 1,
+            "Year": "2022",
+            "Month": "05",
+            "type": "finance",
+            "source": "remote",
+            "link": "https://docs.google.com/spreadsheets/d/1mU0VhTKePNyaVZlfM6CgxdczAHMVXm0nKOkafnoM7g0/edit?usp=sharing",
+            "detail": {
+                "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
+                "df_slice": {"0": [[3,34], 1, 2], "2": [[2,33], 1, 2], "3": [[2,33], 0, 5, 6, 7], "4": [[1,32], 0, 1]},
+                "column_name": {"0": ["NGAY", "DOANH-THU"], "2": ["NGAY", "CHI-PHI"], "3": ["NGAY", "NET-SP-FOOD", "GRAB", "BAEMIN"], "4": ["NGAY","CK-SP-FOOD"]}
+            }
+        },
+        {
+            "no": 2,
+            "Year": "2022",
+            "Month": "04",
+            "type": "order",
+            "source": "local",
+            "link": "data/Chi-tiet-doanh-thu-theo-hoa-don-va-mat-hang.xls"
+        }
+    ],
+    "base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
+    "gg_connect_file": "even-impulse-302623-7a2843af23d8.json",
+    "demo": "Hai",
+    "days_in_month": {"01": 31, "02": 28, "03": 31, "04": 30, "05": 31, "06": 30, "07": 31, "08": 31,
+                        "09": 30, "10": 31, "11": 30, "12": 31}
+}
