@@ -81,11 +81,6 @@ with placeholder.container():
     if de > ds:
         st.altair_chart(fig_2, use_container_width=True)
     get_statistic_prfs = get_statistic_prfs(percent_revenue_from_source, options)
-    col7, col8 = st.columns(2)
-    with col7:
-        st.markdown(f'Ngày bắt đầu: {ds.strftime("%d/%m/%Y")}')
-    with col8:
-        st.markdown(f'Ngày kết thúc: {de.strftime("%d/%m/%Y")}')
     st.table(get_statistic_prfs.style.format({'Max': '{:,.2f}', 'Min': '{:,.2f}',
                                            'Avg': '{:,.2f}'}))
         

@@ -90,11 +90,12 @@ def percent_revenue_from_source(df, ds, de, options):
 def create_df_stt_prfs(df, options):
     temp_arr = []
     for i, el in enumerate(options):
-            row = [options[i], round(np.max(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2),
-                        round(np.min(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2), round(np.mean(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2)]
-            temp_arr.append(row)
-    temp_df = pd.DataFrame(temp_arr, columns=['Loại doanh thu', 'Max', 'Min', "Avg"])
+        row = [np.min(df['Ngày']), np.max(df['Ngày']), options[i], round(np.max(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2),
+                    round(np.min(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2), round(np.mean(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2)]
+        temp_arr.append(row)
+    temp_df = pd.DataFrame(temp_arr, columns=['Ngày bắt đầu', 'Ngày kết thúc', 'Loại doanh thu', 'Max', 'Min', "Avg"])
     return temp_df
+
 def get_statistic_prfs(df, options):
     if len(options):
         final_df = create_df_stt_prfs(df, options)
