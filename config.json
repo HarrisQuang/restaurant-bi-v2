@@ -1,11 +1,12 @@
 {
     "data_source": [
         {
-            "no": 1,
+            "id": 1,
             "Year": "2022",
             "Month": "05",
             "type": "finance",
             "source": "remote",
+            "name": "Báo cáo tài chính tháng 5/22",
             "link": "https://docs.google.com/spreadsheets/d/1mU0VhTKePNyaVZlfM6CgxdczAHMVXm0nKOkafnoM7g0/edit?usp=sharing",
             "detail": {
                 "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
@@ -14,15 +15,16 @@
             }
         },
         {
-            "no": 2,
+            "id": 2,
             "Year": "2022",
             "Month": "04",
             "type": "order",
             "source": "local",
+            "name": "Báo cáo đơn hàng tháng 4/22",
             "link": "data/Chi-tiet-doanh-thu-theo-hoa-don-va-mat-hang.xls"
         }
     ],
-    "base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
+    "finance_order_base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
     "gg_connect_file": "even-impulse-302623-7a2843af23d8.json",
     "demo": "Hai",
     "days_in_month": {"01": 31, "02": 28, "03": 31, "04": 30, "05": 31, "06": 30, "07": 31, "08": 31,
