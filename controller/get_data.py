@@ -66,7 +66,18 @@ def create_df_finance(ds):
     return final_report
 
 def create_df_order(ds):
-    pass
+    type = ds["type"]
+    year = ds["Year"]
+    month = ds["Month"]
+    sh = gc.open_by_url(ds['link'])
+    ws = sh.get_worksheet(0)
+    df = pd.DataFrame(ws.get_values())
+    df = df.iloc[ds['header_row_index']:]
+    df.columns = df.iloc[0]
+    df = df[2:]
+    df = df[data['order_df_base_cols']]
+    final_report = {'year': year, 'month': month, 'type': type, 'df': df}
+    return final_report
 
 def export_one_df(name):
     ds = get_data_source_by_name(name)
@@ -122,3 +133,7 @@ def export_df_order():
         final_report = {'year': year, 'month': month, 'type': type, 'df': df}
         final_df_arr.append(final_report)
     return final_df_arr
+
+
+# ds = export_one_df('Báo cáo đơn hàng tháng 4/22')
+# print(ds['df'].head())

@@ -8,12 +8,12 @@ sys.path.append(path)
 from utils import *
 from get_data import *
 
-with open('config.json', "r") as f:
+with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
 
-def processing_final_df_finance(final_df):
-    finance_order_base_cols = data['finance_order_base_cols']
-    for i in finance_order_base_cols:
+def processing_df_finance(final_df):
+    finance_df_base_cols = data['finance_df_base_cols']
+    for i in finance_df_base_cols:
         final_df[i] = transform_col(final_df[i])
         final_df[i] = final_df[i].astype(float)
     final_df['SP-FOOD'] = final_df['CK-SP-FOOD'] + final_df['NET-SP-FOOD']
@@ -26,18 +26,36 @@ def processing_final_df_finance(final_df):
     final_df['PCT-TAI-QUAN'] = round(final_df['TAI-QUAN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
     return final_df
 
+def processing_df_order(final_df):
+    final_df['Mã món'].replace('', np.nan, inplace=True)
+    final_df.dropna(subset = ['Mã món'], axis = 0, inplace=True)
+    final_df['Ngày'].replace('', np.nan, inplace=True)
+    final_df.dropna(subset = ['Ngày'], axis = 0, inplace=True)
+    final_df['Đơn giá'] = transform_col(final_df['Đơn giá'])
+    final_df['Doanh thu'] = transform_col(final_df['Doanh thu'])
+    final_df['SL bán'] = final_df['SL bán'].apply(lambda x: subtring_from_comma(x))
+    final_df[['SL bán', 'Đơn giá', 'Doanh thu']] = final_df[['SL bán', 'Đơn giá', 'Doanh thu']].astype(float, copy=True)
+    final_df['Ngày'] = final_df['Ngày'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))
+    final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
+    return final_df
+    
 def finalize_list_df_finance():
     result = export_df_finance()
     group = []
     for el in result:
         group.append(el['df'])
     final_df = pd.concat(group)
-    final_df = processing_final_df_finance(final_df)
+    final_df = processing_df_finance(final_df)
     return final_df
 
 def finalize_one_df_finance(name):
     final_df = export_one_df(name)['df']
-    final_df = processing_final_df_finance(final_df)
+    final_df = processing_df_finance(final_df)
+    return final_df
+
+def finalize_one_df_order(name):
+    final_df = export_one_df(name)['df']
+    final_df = processing_df_order(final_df)
     return final_df
 
 def revenue_cost_overal(df):
@@ -103,3 +121,55 @@ def get_statistic_prfs(df, options):
         options = ['BAEMIN', 'GRAB', 'SP-FOOD', 'Tại quán']
         final_df = create_df_stt_prfs(df, options)
     return final_df
+
+def get_default_params_bsd(df):
+    date_from = np.min(df['Ngày'])
+    date_to = np.max(df['Ngày'])
+    return date_from, date_to
+
+def remove_extra_fee(df):
+    for i in data['extra_fee']:
+        df = df[df['Tên món'] != i]
+    return df
+
+def resolve_overlap_dish(df):
+    df = df.groupby(['Ngày', 'Mã món', 'Tên món'], as_index=False).agg({'SL bán': 'sum', 'Doanh thu': 'sum', 
+                                                                            'Đơn giá': 'max'})
+    for k in df['Ngày'].unique():
+        for i, mon in enumerate(data['overlap_dish_code']):
+            don_gia = 0
+            sl_ban = 0
+            doanh_thu = 0
+            for j in mon:
+                try:
+                    don_gia = df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Đơn giá'].values[0]
+                    sl_ban += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['SL bán'].values[0]
+                    doanh_thu += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Doanh thu'].values[0]
+                    df.loc[(df['Mã món'] == j) & (df['Ngày'] == k), 'Mã món'] = np.nan
+                except:
+                    pass
+            new_row = {'Ngày': k, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
+                    'Doanh thu': doanh_thu}
+            df = df.append(new_row, ignore_index=True)
+            df.dropna(subset=['Mã món'], axis = 0, inplace = True)
+    return df
+
+def top_slider(df, ds, de):
+    df = remove_extra_fee(df)
+    df = resolve_overlap_dish(df)
+    df = df[(df['Ngày'] >= ds) & (df['Ngày'] <= de)]
+    df = df.groupby(["Tên món", 'Mã món'], as_index=False).agg({'Đơn giá': 'max', 'SL bán': 'sum', 
+                                                                            'Doanh thu': 'sum'})
+    return df, df.shape[0]
+
+def top_seller_dish(df, top_quantity, top_revenue):
+    top_dish_quantity = df.sort_values(by='SL bán', ascending=False).head(top_quantity).reset_index(drop = True)
+    top_dish_quantity.index += 1
+    top_dish_quantity = top_dish_quantity[['Tên món', 'Đơn giá', 'Doanh thu', 'SL bán']]
+    top_dish_revenue = df.sort_values(by='Doanh thu', ascending=False).head(top_revenue).reset_index(drop = True)
+    top_dish_revenue.index += 1
+    top_dish_revenue = top_dish_revenue[['Tên món', 'Đơn giá', 'SL bán', 'Doanh thu']]
+    return top_dish_quantity, top_dish_revenue
+
+# df = finalize_one_df_order('Báo cáo đơn hàng tháng 4/22')
+# print(df.head())

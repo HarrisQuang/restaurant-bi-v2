@@ -2,10 +2,10 @@ import streamlit as st
 import altair as alt
 import os, sys
 import numpy as np
-path = os.path.abspath('./controller')
+path = os.path.abspath('.')
 sys.path.append(path)
-from processing_data import *
-from get_data import *
+from controller.processing_data import *
+from controller.get_data import *
 
 st.set_page_config(
     page_title="Rau Cu Nam report",
@@ -30,7 +30,8 @@ with placeholder.container():
         with col2:
             sld_order_report = st.selectbox("Kỳ báo cáo đơn hàng", order_data_name_list, index = len(order_data_name_list)-1)
         submitted = st.form_submit_button('Thực hiện')
-    df = finalize_one_df_finance(sld_finance_report)
+    df_finance = finalize_one_df_finance(sld_finance_report)
+    df_order = finalize_one_df_order(sld_order_report)
     st.markdown("### Tổng quan doanh thu, chi phí")
     hover = alt.selection_single(fields=["Sub-cate"],nearest=True,on="mouseover",empty="none")
 
@@ -38,7 +39,7 @@ with placeholder.container():
     range_ = ['#01A14B', '#4AC7C3', 'grey', '#4AC7C3', '#01A14B', '#E24A2C', '#E24A2C', 'grey']
     sub_cate_order = ['GRAB', 'SP-FOOD', 'BAEMIN', 'TAI-QUAN', 'CK-GRAB', 'CK-SP-FOOD', 'CK-BAEMIN', 'CHI-PHI']
 
-    revenue_cost_overal = revenue_cost_overal(df)
+    revenue_cost_overal = revenue_cost_overal(df_finance)
 
     fig = alt.Chart(revenue_cost_overal).mark_bar().encode(x=alt.X('Main-cate:N', title=None, axis=alt.Axis(labelColor=label_colors), 
                                                             sort=['DOANH-THU', 'CHI-PHI']), 
@@ -61,7 +62,7 @@ with placeholder.container():
     strokeWidth=0), use_container_width=False)
     
     st.markdown("### Tỷ trọng doanh thu")
-    date_from, date_to, dthu_type = get_default_params_prfs(df)
+    date_from, date_to, dthu_type = get_default_params_prfs(df_finance)
     
     with st.form(key='form-ty-trong-dthu'):
         col3, col4 = st.columns(2) 
@@ -73,7 +74,7 @@ with placeholder.container():
         with col5:
             options = st.multiselect('Chọn nguồn doanh thu', dthu_type)
         submitted = st.form_submit_button('Thực hiện')
-    percent_revenue_from_source = percent_revenue_from_source(df, ds, de, options)
+    percent_revenue_from_source = percent_revenue_from_source(df_finance, ds, de, options)
     fig_2 = alt.Chart(percent_revenue_from_source).mark_line().encode(x = 'Ngày:O', y = 'Tỷ-lệ-%:Q', color = 'Nguồn-doanh-thu:N', strokeDash='Nguồn-doanh-thu:N')
     st.text(" ")
     st.text(" ")
@@ -85,7 +86,33 @@ with placeholder.container():
                                            'Avg': '{:,.2f}'}))
         
     st.markdown("### Món bán chạy")
+    date_from, date_to = get_default_params_bsd(df_order)
+    with st.form(key='form-mon-ban-chay'):
+        col7, col8 = st.columns(2)
+        with col7:
+            ds = st.date_input("Ngày bắt đầu", date_from, date_from, date_to)
+        with col8:
+            de = st.date_input("Ngày kết thúc", date_to, date_from, date_to)
+        submitted = st.form_submit_button('Thực hiện')
+    
+    df_order, top_slider = top_slider(df_order, ds, de)
+    col9, col10 = st.columns(2)
+    with col9:
+        top_quantity = st.slider("Top SL:", 1, top_slider, 10)
+    with col10:
+        top_revenue = st.slider("Top Doanh thu:", 1, top_slider, 10)
+    top_dish_quantity, top_dish_revenue = top_seller_dish(df_order, top_quantity, top_revenue)
+    col11, col12 = st.columns(2)
+    with col11:
+        st.write('Top món ăn theo số lượng bán')
+        st.table(top_dish_quantity.style.format({'SL bán': '{:,.0f}', 'Đơn giá': '{:,.0f}',
+                                           'Doanh thu': '{:,.0f}'}))
+    with col12:
+        st.write('Top món ăn theo doanh thu')
+        st.table(top_dish_revenue.style.format({'SL bán': '{:,.0f}', 'Đơn giá': '{:,.0f}',
+                                           'Doanh thu': '{:,.0f}'}))
     
     st.markdown("### Món ăn bán mỗi ngày")
+    
 
     st.markdown("### Số lượng đơn bán mỗi ngày")

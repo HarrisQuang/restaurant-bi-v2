@@ -11,3 +11,8 @@ def transform_col(sr):
     sr = sr.str.strip()
     sr = sr.apply(lambda x: rreplace(x, '.', '', x.count('.')))
     return sr
+
+def subtring_from_comma(str):
+    i = str.index(',')
+    str = str[0:i]
+    return str
