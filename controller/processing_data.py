@@ -26,6 +26,30 @@ def processing_df_finance(final_df):
     final_df['PCT-TAI-QUAN'] = round(final_df['TAI-QUAN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
     return final_df
 
+def resolve_overlap_dish_remove_extra_fee(df):
+    for i in data['extra_fee']:
+        df = df[df['Tên món'] != i]
+    df = df.groupby(['Ngày', 'Mã món', 'Tên món'], as_index=False).agg({'SL bán': 'sum', 'Doanh thu': 'sum', 
+                                                                            'Đơn giá': 'max'})
+    for k in df['Ngày'].unique():
+        for i, mon in enumerate(data['overlap_dish_code']):
+            don_gia = 0
+            sl_ban = 0
+            doanh_thu = 0
+            for j in mon:
+                try:
+                    don_gia = df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Đơn giá'].values[0]
+                    sl_ban += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['SL bán'].values[0]
+                    doanh_thu += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Doanh thu'].values[0]
+                    df.loc[(df['Mã món'] == j) & (df['Ngày'] == k), 'Mã món'] = np.nan
+                except:
+                    pass
+            new_row = {'Ngày': k, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
+                    'Doanh thu': doanh_thu}
+            df = df.append(new_row, ignore_index=True)
+            df.dropna(subset=['Mã món'], axis = 0, inplace = True)
+    return df
+
 def processing_df_order(final_df):
     final_df['Mã món'].replace('', np.nan, inplace=True)
     final_df.dropna(subset = ['Mã món'], axis = 0, inplace=True)
@@ -37,6 +61,7 @@ def processing_df_order(final_df):
     final_df[['SL bán', 'Đơn giá', 'Doanh thu']] = final_df[['SL bán', 'Đơn giá', 'Doanh thu']].astype(float, copy=True)
     final_df['Ngày'] = final_df['Ngày'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
+    final_df = resolve_overlap_dish_remove_extra_fee(final_df)
     return final_df
     
 def finalize_list_df_finance():
@@ -127,36 +152,7 @@ def get_default_params_bsd(df):
     date_to = np.max(df['Ngày'])
     return date_from, date_to
 
-def remove_extra_fee(df):
-    for i in data['extra_fee']:
-        df = df[df['Tên món'] != i]
-    return df
-
-def resolve_overlap_dish(df):
-    df = df.groupby(['Ngày', 'Mã món', 'Tên món'], as_index=False).agg({'SL bán': 'sum', 'Doanh thu': 'sum', 
-                                                                            'Đơn giá': 'max'})
-    for k in df['Ngày'].unique():
-        for i, mon in enumerate(data['overlap_dish_code']):
-            don_gia = 0
-            sl_ban = 0
-            doanh_thu = 0
-            for j in mon:
-                try:
-                    don_gia = df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Đơn giá'].values[0]
-                    sl_ban += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['SL bán'].values[0]
-                    doanh_thu += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Doanh thu'].values[0]
-                    df.loc[(df['Mã món'] == j) & (df['Ngày'] == k), 'Mã món'] = np.nan
-                except:
-                    pass
-            new_row = {'Ngày': k, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
-                    'Doanh thu': doanh_thu}
-            df = df.append(new_row, ignore_index=True)
-            df.dropna(subset=['Mã món'], axis = 0, inplace = True)
-    return df
-
 def top_slider(df, ds, de):
-    df = remove_extra_fee(df)
-    df = resolve_overlap_dish(df)
     df = df[(df['Ngày'] >= ds) & (df['Ngày'] <= de)]
     df = df.groupby(["Tên món", 'Mã món'], as_index=False).agg({'Đơn giá': 'max', 'SL bán': 'sum', 
                                                                             'Doanh thu': 'sum'})
@@ -170,6 +166,25 @@ def top_seller_dish(df, top_quantity, top_revenue):
     top_dish_revenue.index += 1
     top_dish_revenue = top_dish_revenue[['Tên món', 'Đơn giá', 'SL bán', 'Doanh thu']]
     return top_dish_quantity, top_dish_revenue
+
+def dish_list(df):
+    dish_list = df['Tên món'].unique().tolist()
+    dish_list.sort()
+    dish_list.append('...')
+    return dish_list
+
+def dish_sale_every_day(df, sltd_list):
+    filter_df = []
+    for i in sltd_list:
+        if i != '...':
+            temp = df[df['Tên món'] == i ]
+            filter_df.append(temp)
+    if filter_df:
+        final_df = pd.concat(filter_df, axis=0)
+    else:
+        final_df = df[df['Tên món'] == 'Cơm trộn']
+    final_df.loc[:,'Ngày'] = final_df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
+    return final_df
 
 # df = finalize_one_df_order('Báo cáo đơn hàng tháng 4/22')
 # print(df.head())

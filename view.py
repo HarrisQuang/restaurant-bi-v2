@@ -95,13 +95,13 @@ with placeholder.container():
             de = st.date_input("Ngày kết thúc", date_to, date_from, date_to)
         submitted = st.form_submit_button('Thực hiện')
     
-    df_order, top_slider = top_slider(df_order, ds, de)
+    df_order_top, top_slider = top_slider(df_order, ds, de)
     col9, col10 = st.columns(2)
     with col9:
         top_quantity = st.slider("Top SL:", 1, top_slider, 10)
     with col10:
         top_revenue = st.slider("Top Doanh thu:", 1, top_slider, 10)
-    top_dish_quantity, top_dish_revenue = top_seller_dish(df_order, top_quantity, top_revenue)
+    top_dish_quantity, top_dish_revenue = top_seller_dish(df_order_top, top_quantity, top_revenue)
     col11, col12 = st.columns(2)
     with col11:
         st.write('Top món ăn theo số lượng bán')
@@ -113,6 +113,22 @@ with placeholder.container():
                                            'Doanh thu': '{:,.0f}'}))
     
     st.markdown("### Món ăn bán mỗi ngày")
+    dish_list = dish_list(df_order)
+    sltd_list = []
+    with st.form(key='form-mon-ban-moi-ngay'):
+        cols = st.columns(5)
+        for i, col in enumerate(cols):
+            sltd = col.selectbox('Chọn món', dish_list, key=i, index=len(dish_list)-1)
+            sltd_list.append(sltd)
+        submitted = st.form_submit_button('Thực hiện')
+    dish_sale_every_day = dish_sale_every_day(df_order, sltd_list)
     
+    fig_3 = alt.Chart(dish_sale_every_day).mark_line().encode(
+    x = 'Ngày:O',
+    y = 'SL bán:Q',
+    color = 'Tên món:N',
+    strokeDash='Tên món:N')
+
+    st.altair_chart(fig_3, use_container_width=True)
 
     st.markdown("### Số lượng đơn bán mỗi ngày")
