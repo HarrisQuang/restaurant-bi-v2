@@ -61,7 +61,6 @@ def processing_df_order(final_df):
     final_df[['SL bán', 'Đơn giá', 'Doanh thu']] = final_df[['SL bán', 'Đơn giá', 'Doanh thu']].astype(float, copy=True)
     final_df['Ngày'] = final_df['Ngày'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
-    final_df = resolve_overlap_dish_remove_extra_fee(final_df)
     return final_df
     
 def finalize_list_df_finance():
@@ -136,7 +135,7 @@ def create_df_stt_prfs(df, options):
         row = [np.min(df['Ngày']), np.max(df['Ngày']), options[i], round(np.max(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2),
                     round(np.min(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2), round(np.mean(df[df['Nguồn-doanh-thu'] == options[i]]['Tỷ-lệ-%']), 2)]
         temp_arr.append(row)
-    temp_df = pd.DataFrame(temp_arr, columns=['Ngày bắt đầu', 'Ngày kết thúc', 'Loại doanh thu', 'Max', 'Min', "Avg"])
+    temp_df = pd.DataFrame(temp_arr, columns=['Ngày bắt đầu', 'Ngày kết thúc', 'Loại doanh thu', 'Max (Tỷ lệ %)', 'Min (Tỷ lệ %)', "Avg (Tỷ lệ %)"])
     return temp_df
 
 def get_statistic_prfs(df, options):
@@ -153,6 +152,7 @@ def get_default_params_bsd(df):
     return date_from, date_to
 
 def top_slider(df, ds, de):
+    df = resolve_overlap_dish_remove_extra_fee(df)
     df = df[(df['Ngày'] >= ds) & (df['Ngày'] <= de)]
     df = df.groupby(["Tên món", 'Mã món'], as_index=False).agg({'Đơn giá': 'max', 'SL bán': 'sum', 
                                                                             'Doanh thu': 'sum'})
@@ -168,12 +168,14 @@ def top_seller_dish(df, top_quantity, top_revenue):
     return top_dish_quantity, top_dish_revenue
 
 def dish_list(df):
+    df = resolve_overlap_dish_remove_extra_fee(df)
     dish_list = df['Tên món'].unique().tolist()
     dish_list.sort()
     dish_list.append('...')
     return dish_list
 
 def dish_sale_every_day(df, sltd_list):
+    df = resolve_overlap_dish_remove_extra_fee(df)
     filter_df = []
     for i in sltd_list:
         if i != '...':
@@ -182,8 +184,54 @@ def dish_sale_every_day(df, sltd_list):
     if filter_df:
         final_df = pd.concat(filter_df, axis=0)
     else:
-        final_df = df[df['Tên món'] == 'Cơm trộn']
+        final_df = df[(df['Tên món'] == 'Cơm trộn') | (df['Tên món'] == 'Gỏi Cuốn Nấm') |
+                      (df['Tên món'] == 'Bún Chả Giò Nấm') | (df['Tên món'] == 'Bún Thái')]
     final_df.loc[:,'Ngày'] = final_df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
+    return final_df
+
+def create_df_stt_dsed(df, sltd_list):
+    df = resolve_overlap_dish_remove_extra_fee(df)
+    temp_arr = []
+    for i, el in enumerate(sltd_list):
+        if el != '...':
+            row = [sltd_list[i], round(np.max(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
+                        round(np.min(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2), round(np.mean(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2)]
+            temp_arr.append(row)
+    temp_df = pd.DataFrame(temp_arr, columns=['Món', 'Max (SL bán)', 'Min (SL bán)', "Avg (SL bán)"])
+    return temp_df
+
+def get_statistic_dsed(df, sltd_list):
+    count = 0
+    for i in sltd_list:
+        if i == '...':
+            count += 1
+    if count < 5:
+        final_df = create_df_stt_dsed(df, sltd_list)
+    else:
+        sltd_list = ['Cơm trộn', 'Gỏi Cuốn Nấm', 'Bún Chả Giò Nấm', 'Bún Thái']
+        final_df = create_df_stt_dsed(df, sltd_list)
+    return final_df
+
+def order_sale_every_day(df):
+    arr = []
+    for el in df['Ngày'].unique():
+        count = df[df['Ngày'] == el]['Số hóa đơn'].nunique()
+        temp = [el, count]
+        arr.append(temp)
+    df = pd.DataFrame(arr, columns=['Ngày', 'SL hóa đơn'])
+    df['Ngày'] = df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
+    return df
+
+def get_statistic_osed(df):
+    temp_arr = []
+    vals, counts = np.unique(df['SL hóa đơn'], return_counts=True)
+    mode_value_index = np.argwhere(counts == np.max(counts))
+    mode_value = vals[mode_value_index][0][0]
+    row = [round(np.max(df['SL hóa đơn']), 2), round(np.min(df['SL hóa đơn']), 2), round(np.mean(df['SL hóa đơn']), 2),
+           round(np.median(df['SL hóa đơn']), 2), round(mode_value, 2)]
+    temp_arr.append(row)
+    final_df = pd.DataFrame(temp_arr, columns=['Max (SL hóa đơn)', 'Min (SL hóa đơn)', "Avg (SL hóa đơn)",
+                                               'Median (SL hóa đơn)', 'Mode (SL hóa đơn)'])
     return final_df
 
 # df = finalize_one_df_order('Báo cáo đơn hàng tháng 4/22')

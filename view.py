@@ -82,8 +82,8 @@ with placeholder.container():
     if de > ds:
         st.altair_chart(fig_2, use_container_width=True)
     get_statistic_prfs = get_statistic_prfs(percent_revenue_from_source, options)
-    st.table(get_statistic_prfs.style.format({'Max': '{:,.2f}', 'Min': '{:,.2f}',
-                                           'Avg': '{:,.2f}'}))
+    st.table(get_statistic_prfs.style.format({'Max (Tỷ lệ %)': '{:,.2f}', 'Min (Tỷ lệ %)': '{:,.2f}',
+                                           'Avg (Tỷ lệ %)': '{:,.2f}'}))
         
     st.markdown("### Món bán chạy")
     date_from, date_to = get_default_params_bsd(df_order)
@@ -112,7 +112,7 @@ with placeholder.container():
         st.table(top_dish_revenue.style.format({'SL bán': '{:,.0f}', 'Đơn giá': '{:,.0f}',
                                            'Doanh thu': '{:,.0f}'}))
     
-    st.markdown("### Món ăn bán mỗi ngày")
+    st.markdown("### Số lượng (món ăn) bán mỗi ngày")
     dish_list = dish_list(df_order)
     sltd_list = []
     with st.form(key='form-mon-ban-moi-ngay'):
@@ -122,13 +122,25 @@ with placeholder.container():
             sltd_list.append(sltd)
         submitted = st.form_submit_button('Thực hiện')
     dish_sale_every_day = dish_sale_every_day(df_order, sltd_list)
-    
+
     fig_3 = alt.Chart(dish_sale_every_day).mark_line().encode(
     x = 'Ngày:O',
     y = 'SL bán:Q',
     color = 'Tên món:N',
     strokeDash='Tên món:N')
-
     st.altair_chart(fig_3, use_container_width=True)
+    
+    get_statistic_dsed = get_statistic_dsed(df_order, sltd_list)
+    st.table(get_statistic_dsed.style.format({'Max (SL bán)': '{:,.0f}', 'Min (SL bán)': '{:,.0f}',
+                                           'Avg (SL bán)': '{:,.2f}'}))
 
-    st.markdown("### Số lượng đơn bán mỗi ngày")
+    st.markdown("### Số lượng (đơn hàng) bán mỗi ngày")
+    order_sale_every_day = order_sale_every_day(df_order)
+    fig_4 = alt.Chart(order_sale_every_day).mark_line().encode(
+    x = 'Ngày:O',
+    y = 'SL hóa đơn:Q')
+    st.altair_chart(fig_4, use_container_width=True)
+    
+    get_statistic_osed = get_statistic_osed(order_sale_every_day)
+    st.table(get_statistic_osed.style.format({'Max (SL hóa đơn)': '{:,.0f}', 'Min (SL hóa đơn)': '{:,.0f}',
+                                           'Avg (SL hóa đơn)': '{:,.2f}', 'Median (SL hóa đơn)': '{:,.0f}', 'Mode (SL hóa đơn)': '{:,.0f}'}))
