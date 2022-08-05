@@ -23,6 +23,20 @@
             "name": "Báo cáo đơn hàng tháng 4/22",
             "link": "https://docs.google.com/spreadsheets/d/1C8oxPxMBpj7vn_BTUfHOQHZNhODOeuGt73suF4ZnOU0/edit?usp=sharing",
             "header_row_index": 8
+        },
+        {
+            "id": 3,
+            "Year": "2022",
+            "Month": "06",
+            "type": "finance",
+            "source": "remote",
+            "name": "Báo cáo tài chính tháng 6/22",
+            "link": "https://docs.google.com/spreadsheets/d/1U8i87_OUlsEpwqKXMl3EeFOMu6tNHwBt-349pcfByjA/edit?usp=sharing",
+            "detail": {
+                "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
+                "df_slice": {"0": [[3,33], 1, 2], "2": [[2,32], 1, 2], "3": [[2,32], 0, 5, 6, 7], "4": [[1,31], 0, 1]},
+                "column_name": {"0": ["NGAY", "DOANH-THU"], "2": ["NGAY", "CHI-PHI"], "3": ["NGAY", "NET-SP-FOOD", "GRAB", "BAEMIN"], "4": ["NGAY","CK-SP-FOOD"]}
+            }
         }
     ],
     "finance_df_base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
