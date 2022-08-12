@@ -132,7 +132,7 @@ with placeholder.container():
     
     get_statistic_dsed = get_statistic_dsed(df_order, sltd_list)
     st.table(get_statistic_dsed.style.format({'Max (SL bán)': '{:,.0f}', 'Min (SL bán)': '{:,.0f}',
-                                           'Avg (SL bán)': '{:,.2f}'}))
+                                           'Avg (SL bán)': '{:,.2f}', 'Median (SL bán)': '{:,.0f}', 'Mode (SL bán)': '{:,.0f}'}))
 
     st.markdown("### Số lượng (đơn hàng) bán mỗi ngày")
     order_sale_every_day = order_sale_every_day(df_order)

@@ -194,10 +194,18 @@ def create_df_stt_dsed(df, sltd_list):
     temp_arr = []
     for i, el in enumerate(sltd_list):
         if el != '...':
+            new_df = df[df['Tên món'] == sltd_list[i]]
+            vals, counts = np.unique(new_df['SL bán'], return_counts=True)
+            mode_value_index = np.argwhere(counts == np.max(counts))
+            mode_value = vals[mode_value_index][0][0]
             row = [sltd_list[i], round(np.max(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
-                        round(np.min(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2), round(np.mean(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2)]
+                        round(np.min(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2), 
+                        round(np.mean(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
+                        round(np.median(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
+                        round(mode_value, 2)]
             temp_arr.append(row)
-    temp_df = pd.DataFrame(temp_arr, columns=['Món', 'Max (SL bán)', 'Min (SL bán)', "Avg (SL bán)"])
+    temp_df = pd.DataFrame(temp_arr, columns=['Món', 'Max (SL bán)', 'Min (SL bán)', "Avg (SL bán)",
+                                              'Median (SL bán)', 'Mode (SL bán)'])
     return temp_df
 
 def get_statistic_dsed(df, sltd_list):
