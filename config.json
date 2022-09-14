@@ -19,7 +19,7 @@
             "Year": "2022",
             "Month": "04",
             "type": "order",
-            "source": "local",
+            "source": "remote",
             "name": "Báo cáo đơn hàng tháng 4/22",
             "link": "https://docs.google.com/spreadsheets/d/1C8oxPxMBpj7vn_BTUfHOQHZNhODOeuGt73suF4ZnOU0/edit?usp=sharing",
             "header_row_index": 8
@@ -65,13 +65,60 @@
                 "df_slice": {"0": [[3,34], 1, 2], "2": [[2,33], 1, 2], "3": [[2,33], 0, 5, 6, 7], "4": [[1,32], 0, 1]},
                 "column_name": {"0": ["NGAY", "DOANH-THU"], "2": ["NGAY", "CHI-PHI"], "3": ["NGAY", "NET-SP-FOOD", "GRAB", "BAEMIN"], "4": ["NGAY","CK-SP-FOOD"]}
             }
+        },
+        {
+            "id": 6,
+            "Year": "2022",
+            "Month": "05",
+            "type": "order",
+            "source": "remote",
+            "name": "Báo cáo đơn hàng tháng 5/22",
+            "link": "https://docs.google.com/spreadsheets/d/1LyqqwbWkZzA6WZPeIPoHIPPqWHXPQ6puLfbhAMVIQq4/edit?usp=sharing",
+            "header_row_index": 8
+        },
+        {
+            "id": 7,
+            "Year": "2022",
+            "Month": "06",
+            "type": "order",
+            "source": "remote",
+            "name": "Báo cáo đơn hàng tháng 6/22",
+            "link": "https://docs.google.com/spreadsheets/d/1Hu9dIJvmBJxiVMfW5DGO9bVEkQ63AuYBqtZr5h-Lp4k/edit?usp=sharing",
+            "header_row_index": 8
+        },
+        {
+            "id": 8,
+            "Year": "2022",
+            "Month": "07",
+            "type": "order",
+            "source": "remote",
+            "name": "Báo cáo đơn hàng tháng 7/22",
+            "link": "https://docs.google.com/spreadsheets/d/1lxyEa9UH5M8mBKLPJFcH9ohQL6zvxYBj0jFAY2IJ3Zc/edit?usp=sharing",
+            "header_row_index": 8
         }
     ],
     "finance_df_base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
     "order_df_base_cols": ["Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
-    "overlap_dish_code": [["CSNC", "comsuonnuong"], ["COTRSOTUOT", "R013"], ["HTX", "Hutieuxaoden"], ["LNL", "LNN"], ["LTL", "LTN", "LCN"], ["TD", "1"]],
+    "various_dish_name": {"Gỏi 'Rau Củ Nâm' Đặt Biệt": "Gỏi 'Rau Củ Nấm' Đặt Biệt"} ,
+    "overlap_dish_code": [["CSNC", "comsuonnuong", "COSUNUCH"], ["COTRSOTUOT", "R013"], ["HTX", "Hutieuxaoden"], ["LNL", "LNN"], ["LTL", "LTN", "LCN"], ["TD", "1"]],
+    "mask_dish_name": {"Lẩu thái": "Lẩu tứ xuyên", "Lẩu nấm": "Lẩu tiềm ngũ sắc", "Hủ tiếu xào đen": "Hủ tiếu tương đen", "Cơm trộn": "Cơm ngũ vị",
+                        "Cơm sườn nướng": "Cơm gà nướng", "Bún Thái": "Bún bò huế", "Cơm chiên vị khóm": "Cơm chiên cá mặn", "Canh Củ Sen": "Canh xà lách xoong",
+                        "Cá lóc Kho Tiêu": "Cá lóc kho tộ", "Canh Mướp Hương": "Canh cải thảo",
+                        "Cháo nấm đặc biệt": "Cháo vịt", "Cơm Xào Rau Củ Nấm": "Cơm xào hải sản", "Cá kèo chay kho": "Cá hú kho tiêu",
+                        "Cơm chiên chà bông đặc biệt": "Cơm chiên khóm", "Cải thìa sốt dầu hào": "Cải bó xôi xào", "Đậu Hũ Hoàng Kim": "Đậu hũ lăn bột",
+                        "Đậu Hủ Kho Tàu": "Đậu hủ sốt cà", "Gỏi 'Rau Củ Nấm' Đặt Biệt": "Gỏi thái chua cay", "Hoành thánh lá": "Hoành thánh tôm", "Hủ Tiếu": "Miến gà",
+                        "Mỳ xào giòn": "Mỳ tương đen", "Nấm đùi gà kho tiêu": "Nấm kho xả", "Sâm Mía Lau": "Sâm dưỡng nhan",
+                        "Sả Chanh Gừng": "Chanh dây", "Bún Chả Giò Nấm": "Bún thịt nướng", "Gỏi Cuốn Nấm": "Bì cuốn", "Cơm Chiên Rau Củ Nấm": "Cơm chiên cá",
+                        "Chả giò": "Dim sum", "Mỳ Ý Sốt Cà": "Mỳ Ý đút lò", "Mỳ Nước Rau Củ Nấm": "Mỳ thịt bằm", "Mỳ Ý Sốt Kem Nấm": "Mỳ Ý hấp nghêu",
+                        "Salad Trộn Dầu Giấm": "Salad trộn sốt mè", "Salad Nga": "Salad sốt dầu hào", "Canh Bí Đỏ": "Canh củ sen", "Canh Rong Biển": "Canh khoai mỡ",
+                        "Mỳ Trộn  cha-soba": "Mỳ xào hải sản", "Mỳ Xào Mềm": "Mỳ vịt tiềm", "Rau Củ Xào Dầu hào": "Rau củ xào dầu hào", "Rau Muống Xào Tỏi": "Rau muống xào",
+                        "Chả giò rau củ nấm đặc biệt": "Chả cá lã vọng", "Hoành Thánh Chiên": "Hoành thánh chiên giòn",
+                        "Nấm rơm kho": "Tép rim kho", "Sữa Hạt Sen": "Sữa bắp",
+                        "chả đậu hủ ky": "chả cá chiên", "Sữa Gạo Lức": "Sữa đậu nành",
+                        "Chả Phù Chúc Bánh Hỏi": "Chả cua", "Chả phù chúc kho tàu": "Chả giò hấp"
+                        },
     "new_dish_name": ["Cơm sườn nướng", "Cơm trộn", "Hủ tiếu xào đen", "Lẩu nấm", "Lẩu thái", "Trà đá"],
-    "extra_fee": ["Phụ thu 5000", "Phụ thu 3000", "Phụ thu 1000", "Phụ Thu 2000", "Phụ thu 5K", "Phụ thu 4000", "Phu thu 100k"],
+    "extra_fee": ["Phí ship", "Phụ thu 6000", "Phụ thu 5000", "Phụ thu 3000", "Phụ thu 1000", "Phụ Thu 2000", "Phụ thu 5K", "Phụ thu 4000", "Phu thu 100k"],
     "gg_connect_file": "even-impulse-302623-7a2843af23d8.json",
     "days_in_month": {"01": 31, "02": 28, "03": 31, "04": 30, "05": 31, "06": 30, "07": 31, "08": 31,
                         "09": 30, "10": 31, "11": 30, "12": 31}

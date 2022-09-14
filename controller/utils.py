@@ -12,7 +12,14 @@ def transform_col(sr):
     sr = sr.apply(lambda x: rreplace(x, '.', '', x.count('.')))
     return sr
 
+def replace_double_quote(str):
+    str = rreplace(str, "'", '"', str.count("'"))
+    return str
+
 def subtring_from_comma(str):
-    i = str.index(',')
-    str = str[0:i]
+    try:
+        i = str.index(',')
+        str = str[0:i]
+    except:
+        pass
     return str

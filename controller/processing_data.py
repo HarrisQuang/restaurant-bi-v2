@@ -11,6 +11,8 @@ from get_data import *
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
 
+msk_dish_name = data['mask_dish_name']
+
 def processing_df_finance(final_df):
     finance_df_base_cols = data['finance_df_base_cols']
     for i in finance_df_base_cols:
@@ -26,28 +28,53 @@ def processing_df_finance(final_df):
     final_df['PCT-TAI-QUAN'] = round(final_df['TAI-QUAN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
     return final_df
 
+def resolve_various_dish_name(df):
+    df['Tên món'] = df['Tên món'].str.strip()
+    vro_dish_name = data['various_dish_name']
+    for key in vro_dish_name.keys():
+        old_val = replace_double_quote(key)
+        new_val = replace_double_quote(vro_dish_name[key])
+        df['Tên món'].replace(old_val, new_val, inplace=True)
+    return df
+
+def create_mask_dish_name(df):
+    df['Tên món'] = df['Tên món'].str.strip()
+    for key in msk_dish_name.keys():
+        old_val = replace_double_quote(key)
+        new_val = replace_double_quote(msk_dish_name[key])
+        df['Tên món'].replace(old_val, new_val, inplace=True)
+    return df
+
 def resolve_overlap_dish_remove_extra_fee(df):
+    df = resolve_various_dish_name(df)
     for i in data['extra_fee']:
         df = df[df['Tên món'] != i]
-    df = df.groupby(['Ngày', 'Mã món', 'Tên món'], as_index=False).agg({'SL bán': 'sum', 'Doanh thu': 'sum', 
-                                                                            'Đơn giá': 'max'})
+    df = df.groupby(['Ngày', 'Cycle', 'Mã món', 'Tên món'], as_index=False).agg({'SL bán': 'sum', 'Doanh thu': 'sum', 
+                                                                        'Đơn giá': 'max'})
     for k in df['Ngày'].unique():
         for i, mon in enumerate(data['overlap_dish_code']):
             don_gia = 0
             sl_ban = 0
             doanh_thu = 0
+            cycle = ''
             for j in mon:
                 try:
                     don_gia = df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Đơn giá'].values[0]
+                    cycle = df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Cycle'].values[0]
                     sl_ban += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['SL bán'].values[0]
                     doanh_thu += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Doanh thu'].values[0]
                     df.loc[(df['Mã món'] == j) & (df['Ngày'] == k), 'Mã món'] = np.nan
                 except:
                     pass
-            new_row = {'Ngày': k, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
-                    'Doanh thu': doanh_thu}
-            df = df.append(new_row, ignore_index=True)
+            new_row = pd.DataFrame({'Ngày': k, 'Cycle': cycle, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
+                    'Doanh thu': doanh_thu}, index = [df.shape[0]])
+            # new_row = {'Ngày': k, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
+            #         'Doanh thu': doanh_thu}
+            df = pd.concat([new_row, df.loc[:]])
+            # df = df.append(new_row, ignore_index=True)
             df.dropna(subset=['Mã món'], axis = 0, inplace = True)
+    # create mask disk name
+    # df = create_mask_dish_name(df) 
     return df
 
 def processing_df_order(final_df):
@@ -57,19 +84,11 @@ def processing_df_order(final_df):
     final_df.dropna(subset = ['Ngày'], axis = 0, inplace=True)
     final_df['Đơn giá'] = transform_col(final_df['Đơn giá'])
     final_df['Doanh thu'] = transform_col(final_df['Doanh thu'])
-    final_df['SL bán'] = final_df['SL bán'].apply(lambda x: subtring_from_comma(x))
-    final_df[['SL bán', 'Đơn giá', 'Doanh thu']] = final_df[['SL bán', 'Đơn giá', 'Doanh thu']].astype(float, copy=True)
+    final_df['SL bán'] = final_df['SL bán'].apply(lambda x: subtring_from_comma(x)).astype(float, copy=True)
+    final_df[['Đơn giá', 'Doanh thu']] = final_df[['Đơn giá', 'Doanh thu']].astype(float, copy=True)
     final_df['Ngày'] = final_df['Ngày'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
-    return final_df
-    
-def finalize_list_df_finance():
-    result = export_df_finance()
-    group = []
-    for el in result:
-        group.append(el['df'])
-    final_df = pd.concat(group)
-    final_df = processing_df_finance(final_df)
+    final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '/' + str(x.year))
     return final_df
 
 def finalize_one_df_finance(name):
@@ -80,6 +99,49 @@ def finalize_one_df_finance(name):
 def finalize_one_df_order(name):
     final_df = export_one_df(name)['df']
     final_df = processing_df_order(final_df)
+    return final_df
+
+def finalize_list_df_finance_by_cycle(cycle):
+    df = export_list_df_by_type(cycle, 'finance', create_df_finance)
+    df = processing_df_finance(df)
+    return df
+
+def finalize_list_df_order_by_cycle(cycle):
+    df = export_list_df_by_type(cycle, 'order', create_df_order)
+    df = processing_df_order(df)
+    return df
+
+def finalize_list_df_order_grouping_cycle(df, sltd_list):
+    df = resolve_overlap_dish_remove_extra_fee(df)
+    filter_df = []
+    for i in sltd_list:
+        if i != '...':
+            temp = df[df['Tên món'] == i ]
+            filter_df.append(temp)
+    if filter_df:
+        final_df = pd.concat(filter_df, axis=0)
+    else:
+        final_df = df[(df['Tên món'] == 'Cơm trộn') | (df['Tên món'] == 'Gỏi Cuốn Nấm') |
+                      (df['Tên món'] == 'Bún Chả Giò Nấm') | (df['Tên món'] == 'Bún Thái')]
+    part_df = []
+    count = 0
+    for c in final_df['Cycle'].unique():
+        for m in final_df['Tên món'].unique():
+            temp_df = final_df[(final_df['Cycle'] == c) & (final_df['Tên món'] == m)]
+            sum_sl_ban = np.sum(temp_df['SL bán'])
+            max_sl_ban = np.max(temp_df['SL bán'])
+            min_sl_ban = np.min(temp_df['SL bán'])
+            avg_sl_ban = round(np.mean(temp_df['SL bán']),2)
+            median_sl_ban = np.median(temp_df['SL bán'])
+            vals, counts = np.unique(temp_df['SL bán'], return_counts=True)
+            mode_value_index = np.argwhere(counts == np.max(counts))
+            mode_sl_ban = vals[mode_value_index][0][0]
+            temp_df = pd.DataFrame({'Cycle': c, 'Tên món': m, 'Tổng SL bán': sum_sl_ban, 'Max SL bán': max_sl_ban,
+                                 'Min SL bán': min_sl_ban, 'Avg SL bán': avg_sl_ban, 'Median SL bán': median_sl_ban,
+                                 'Mode SL bán': mode_sl_ban}, index=[count])
+            part_df.append(temp_df)
+            count += 1
+    final_df = pd.concat(part_df, axis=0)
     return final_df
 
 def revenue_cost_overal(df):
@@ -129,6 +191,23 @@ def percent_revenue_from_source(df, ds, de, options):
     final_df['Ngày'] = final_df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
     return final_df
 
+def percent_revenue_from_source_by_cycle(df, cycle, options):
+    df = df[['PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN', 'NGAY']]
+    df.columns = ['BAEMIN', 'GRAB', 'SP-FOOD', 'Tại quán', 'Ngày']
+    df = df.melt(id_vars=['Ngày'], var_name=['Nguồn-doanh-thu'], value_name='Tỷ-lệ-%')
+    df['Ngày'] = pd.to_datetime(df['Ngày']).dt.date
+    df = df[(df['Ngày'] >= ds) & (df['Ngày'] <= de)]
+    filter_df = []
+    for i in options:
+        temp = df[df['Nguồn-doanh-thu'] == i]
+        filter_df.append(temp)
+    if filter_df:
+        final_df = pd.concat(filter_df, axis=0)
+    else:
+        final_df = df
+    final_df['Ngày'] = final_df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
+    return final_df
+
 def create_df_stt_prfs(df, options):
     temp_arr = []
     for i, el in enumerate(options):
@@ -158,6 +237,11 @@ def top_slider(df, ds, de):
                                                                             'Doanh thu': 'sum'})
     return df, df.shape[0]
 
+def sort_df(df, by, asc=False):
+    df = df.sort_values(by = by, ascending = asc).reset_index(drop = True)
+    df.index += 1
+    return df 
+
 def top_seller_dish(df, top_quantity, top_revenue):
     top_dish_quantity = df.sort_values(by='SL bán', ascending=False).head(top_quantity).reset_index(drop = True)
     top_dish_quantity.index += 1
@@ -186,6 +270,8 @@ def dish_sale_every_day(df, sltd_list):
     else:
         final_df = df[(df['Tên món'] == 'Cơm trộn') | (df['Tên món'] == 'Gỏi Cuốn Nấm') |
                       (df['Tên món'] == 'Bún Chả Giò Nấm') | (df['Tên món'] == 'Bún Thái')]
+        # final_df = df[(df['Tên món'] == msk_dish_name['Cơm trộn']) | (df['Tên món'] == msk_dish_name['Gỏi Cuốn Nấm']) |
+        #               (df['Tên món'] == msk_dish_name['Bún Chả Giò Nấm']) | (df['Tên món'] == msk_dish_name['Bún Thái'])]
     final_df.loc[:,'Ngày'] = final_df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
     return final_df
 
@@ -217,6 +303,7 @@ def get_statistic_dsed(df, sltd_list):
         final_df = create_df_stt_dsed(df, sltd_list)
     else:
         sltd_list = ['Cơm trộn', 'Gỏi Cuốn Nấm', 'Bún Chả Giò Nấm', 'Bún Thái']
+        # sltd_list = [msk_dish_name['Cơm trộn'], msk_dish_name['Gỏi Cuốn Nấm'], msk_dish_name['Bún Chả Giò Nấm'], msk_dish_name['Bún Thái']]
         final_df = create_df_stt_dsed(df, sltd_list)
     return final_df
 
@@ -241,6 +328,3 @@ def get_statistic_osed(df):
     final_df = pd.DataFrame(temp_arr, columns=['Max (SL hóa đơn)', 'Min (SL hóa đơn)', "Avg (SL hóa đơn)",
                                                'Median (SL hóa đơn)', 'Mode (SL hóa đơn)'])
     return final_df
-
-# df = finalize_one_df_order('Báo cáo đơn hàng tháng 4/22')
-# print(df.head())

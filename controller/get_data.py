@@ -30,6 +30,16 @@ def get_order_data_name_list():
         temp_arr.append(el['name'])
     return temp_arr
 
+def get_cycle_list_by_type(type):
+    res = get_data_source_by_type(type)
+    temp_arr = []
+    for el in res:
+        year = el['Year']
+        month = el['Month']
+        string = month + '/' + year
+        temp_arr.append(string)
+    return temp_arr
+
 def get_data_source_by_name(name):
     for el in data["data_source"]:
         if el['name'] == name:
@@ -87,53 +97,48 @@ def export_one_df(name):
         final_report = create_df_order(ds)
     return final_report
 
-def export_df_finance():
+def export_list_df_finance(cycle):
     fn_arr = get_data_source_by_type('finance')
     final_df_arr = []
     for el in fn_arr:
-        sheets = el["detail"]["sheets"]
-        df_slice = el["detail"]["df_slice"]
-        cols = el["detail"]["column_name"]
-        sh = gc.open_by_url(el['link'])
-        days = []
-        for i in range(data["days_in_month"][el["Month"]]):
-            days.append(str(i + 1))
-        type = el["type"]
-        year = el["Year"]
-        month = el["Month"]
-        date = []
-        for day in days:
-            if len(day) == 1:
-                tmp = '0'+ day + '/' + month + '/' + year
-            else:
-                tmp = day + '/' + month + '/' + year
-            date.append(tmp)
-        export_df = pd.DataFrame({'NGAY': date}) 
-        for key in sheets:
-            ws = sh.get_worksheet(int(sheets[key]))
-            df1 = pd.DataFrame(ws.get_values())
-            df2 = pd.DataFrame()
-            for i in range(len(df_slice[sheets[key]]) - 1):
-                df2[i+1] = df1.iloc[df_slice[sheets[key]][0][0]:df_slice[sheets[key]][0][1], df_slice[sheets[key]][i+1]]
-            df2.columns = cols[sheets[key]]
-            export_df = export_df.merge(df2, on = 'NGAY')
-        final_report = {'year': year, 'month': month, 'type': type, 'df': export_df}
-        final_df_arr.append(final_report)
+        meta_report = create_df_finance(el)
+        final_df_arr.append(meta_report)
     return final_df_arr
 
-def export_df_order():
+def export_list_df_order(cycle):
+    if not cycle:
+        temp = get_cycle_list_by_type('order')[-1]
+        cycle =[temp]
     odr_arr = get_data_source_by_type('order')
-    final_df_arr = []
-    for el in odr_arr:
-        type = el["type"]
-        year = el["Year"]
-        month = el["Month"]
-        df = pd.read_excel(el['link'], sheet_name=0, header=8)
-        df = df[['Ngày', 'Số hóa đơn', 'Mã món', 'Tên món', 'SL bán', 'Đơn giá', 'Doanh thu']]
-        final_report = {'year': year, 'month': month, 'type': type, 'df': df}
-        final_df_arr.append(final_report)
-    return final_df_arr
+    temp = []
+    df = pd.DataFrame()
+    for cy in cycle:
+        i = cy.index('/')
+        month = cy[0:i]
+        year = cy[i+1:]
+        for el in odr_arr:
+            res = create_df_order(el)
+            if res['year'] == year and res['month'] == month:
+                order_df = res['df']
+                temp.append(order_df)
+                df = pd.concat(temp)
+    return df
 
-
-# ds = export_one_df('Báo cáo đơn hàng tháng 4/22')
-# print(ds['df'].head())
+def export_list_df_by_type(cycle, type, function):
+    if not cycle:
+        temp = get_cycle_list_by_type(type)[-1]
+        cycle =[temp]
+    odr_arr = get_data_source_by_type(type)
+    temp = []
+    df = pd.DataFrame()
+    for cy in cycle:
+        i = cy.index('/')
+        month = cy[0:i]
+        year = cy[i+1:]
+        for el in odr_arr:
+            res = function(el)
+            if res['year'] == year and res['month'] == month:
+                order_df = res['df']
+                temp.append(order_df)
+                df = pd.concat(temp)
+    return df
