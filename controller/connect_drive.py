@@ -18,6 +18,7 @@ res = getfilelist.GetFileList(resource)
 print(res)
 print('------------------------------')
 print(dict(res)['fileList'])
+print(dict(res)['fileList'][0]['files'])
 
 # engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 # name = 'finance_table'

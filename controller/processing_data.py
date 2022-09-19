@@ -16,6 +16,20 @@ msk_dish_name = data['mask_dish_name']
 def processing_df_finance(final_df):
     finance_df_base_cols = data['finance_df_base_cols']
     for i in finance_df_base_cols:
+        final_df[i] = final_df[i].astype(float)
+    final_df['SP-FOOD'] = final_df['CK-SP-FOOD'] + final_df['NET-SP-FOOD']
+    final_df['CK-GRAB'] = final_df['GRAB'] * 25/100
+    final_df['CK-BAEMIN'] = final_df['BAEMIN'] * 25/100
+    final_df['TAI-QUAN'] = final_df['DOANH-THU'] - final_df['GRAB'] - final_df['BAEMIN'] - final_df['SP-FOOD']
+    final_df['PCT-BAEMIN'] = round(final_df['BAEMIN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
+    final_df['PCT-GRAB'] = round(final_df['GRAB']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
+    final_df['PCT-SP-FOOD'] = round(final_df['SP-FOOD']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2) 
+    final_df['PCT-TAI-QUAN'] = round(final_df['TAI-QUAN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
+    return final_df
+
+def processing_df_finance_old(final_df):
+    finance_df_base_cols = data['finance_df_base_cols']
+    for i in finance_df_base_cols:
         final_df[i] = transform_col(final_df[i])
         final_df[i] = final_df[i].astype(float)
     final_df['SP-FOOD'] = final_df['CK-SP-FOOD'] + final_df['NET-SP-FOOD']
@@ -91,8 +105,8 @@ def processing_df_order(final_df):
     final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '/' + str(x.year))
     return final_df
 
-def finalize_one_df_finance(name):
-    final_df = export_one_df(name)['df']
+def finalize_one_df_finance(file_name):
+    final_df = create_df_finance(file_name)['df']
     final_df = processing_df_finance(final_df)
     return final_df
 
@@ -328,3 +342,8 @@ def get_statistic_osed(df):
     final_df = pd.DataFrame(temp_arr, columns=['Max (SL hóa đơn)', 'Min (SL hóa đơn)', "Avg (SL hóa đơn)",
                                                'Median (SL hóa đơn)', 'Mode (SL hóa đơn)'])
     return final_df
+
+if __name__ == "__main__":
+    df = finalize_one_df_finance('THU CHI T5-22')
+    print(df.head())
+    
