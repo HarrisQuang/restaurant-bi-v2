@@ -6,7 +6,7 @@
             "Month": "05",
             "type": "finance",
             "source": "remote",
-            "name": "Báo cáo tài chính tháng 5/22",
+            "name": "THU CHI T5-22",
             "link": "https://docs.google.com/spreadsheets/d/1mU0VhTKePNyaVZlfM6CgxdczAHMVXm0nKOkafnoM7g0/edit?usp=sharing",
             "detail": {
                 "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
@@ -30,7 +30,7 @@
             "Month": "06",
             "type": "finance",
             "source": "remote",
-            "name": "Báo cáo tài chính tháng 6/22",
+            "name": "THU CHI T6-22",
             "link": "https://docs.google.com/spreadsheets/d/1U8i87_OUlsEpwqKXMl3EeFOMu6tNHwBt-349pcfByjA/edit?usp=sharing",
             "detail": {
                 "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
@@ -44,7 +44,7 @@
             "Month": "07",
             "type": "finance",
             "source": "remote",
-            "name": "Báo cáo tài chính tháng 7/22",
+            "name": "THU CHI T7-22",
             "link": "https://docs.google.com/spreadsheets/d/1kEJgXC_g05X_hGQxPVIHDAnofY08AiTszT3XkCTMgrc/edit?usp=sharing",
             "detail": {
                 "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
@@ -58,7 +58,7 @@
             "Month": "08",
             "type": "finance",
             "source": "remote",
-            "name": "Báo cáo tài chính tháng 8/22",
+            "name": "THU CHI T8-22",
             "link": "https://docs.google.com/spreadsheets/d/1H2ZFSyvUH4s_XAzE_MMxEYmloj_6IqMM3evIYSpaiU8/edit?usp=sharing",
             "detail": {
                 "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},

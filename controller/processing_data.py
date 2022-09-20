@@ -110,6 +110,11 @@ def finalize_one_df_finance(file_name):
     final_df = processing_df_finance(final_df)
     return final_df
 
+def finalize_one_df_finance_old(name):
+    final_df = export_one_df(name)['df']
+    final_df = processing_df_finance(final_df)
+    return final_df
+
 def finalize_one_df_order(name):
     final_df = export_one_df(name)['df']
     final_df = processing_df_order(final_df)

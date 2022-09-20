@@ -67,7 +67,7 @@ def create_df_finance(file_name):
         date.append(tmp)
     export_df = pd.DataFrame({'NGAY': date}) 
     for key in sheets:
-        df1 = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name=int(sheets[key]))
+        df1 = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name=int(sheets[key]), header=None)
         df2 = pd.DataFrame()
         for i in range(len(df_slice[sheets[key]]) - 1):
             df2[i+1] = df1.iloc[df_slice[sheets[key]][0][0]:df_slice[sheets[key]][0][1], df_slice[sheets[key]][i+1]]
@@ -77,6 +77,7 @@ def create_df_finance(file_name):
         df2['NGAY'] = df2['NGAY'].apply(lambda x: x.strftime('%d/%m/%Y'))
         export_df = export_df.merge(df2, on = 'NGAY')
     final_report = {'year': year, 'month': month, 'type': type, 'df': export_df}
+    print(final_report['df'])
     return final_report
 
 def create_df_finance_old(ds):
