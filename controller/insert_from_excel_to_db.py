@@ -8,7 +8,7 @@ from controller.get_data import *
 
 engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 
-# df = finalize_one_df_finance('THU CHI T5-22')
+df = finalize_one_df_finance('THU CHI T5-22')
 
 # root = "VALUES "
 # loop = "('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"
@@ -31,6 +31,7 @@ engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 # query_stmnt = "INSERT INTO finance (NGAY, DOANH_THU, CHI_PHI, NET_SP_FOOD, GRAB, BAEMIN, CK_SP_FOOD, SP_FOOD, CK_GRAB, CK_BAEMIN, TAI_QUAN, PCT_BAEMIN, PCT_GRAB, PCT_SP_FOOD, PCT_TAI_QUAN) " + root % ist_val
 # engine.execute(query_stmnt)
 
-name = 'finance'
-source_df = pd.read_sql_table(name,engine)
-print(source_df.dtypes)
+# name = 'finance'
+# source_df = pd.read_sql_table(name,engine)
+# print(source_df.head())
+

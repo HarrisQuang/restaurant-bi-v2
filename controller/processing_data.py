@@ -16,6 +16,7 @@ msk_dish_name = data['mask_dish_name']
 def processing_df_finance(final_df):
     finance_df_base_cols = data['finance_df_base_cols']
     for i in finance_df_base_cols:
+        final_df[i].replace(np.nan, '0', inplace=True)
         final_df[i] = final_df[i].astype(float)
     final_df['SP-FOOD'] = final_df['CK-SP-FOOD'] + final_df['NET-SP-FOOD']
     final_df['CK-GRAB'] = final_df['GRAB'] * 25/100
@@ -25,6 +26,7 @@ def processing_df_finance(final_df):
     final_df['PCT-GRAB'] = round(final_df['GRAB']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
     final_df['PCT-SP-FOOD'] = round(final_df['SP-FOOD']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2) 
     final_df['PCT-TAI-QUAN'] = round(final_df['TAI-QUAN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
+    print(final_df[['NGAY', 'DOANH-THU', 'GRAB', 'BAEMIN', 'SP-FOOD', 'CK-SP-FOOD', 'NET-SP-FOOD', 'TAI-QUAN', 'PCT-TAI-QUAN']])
     return final_df
 
 def processing_df_finance_old(final_df):

@@ -6,6 +6,10 @@ path = os.path.abspath('.')
 sys.path.append(path)
 from controller.processing_data import *
 from controller.get_data import *
+from sqlalchemy import create_engine, text
+
+with open('config.json', "r", encoding='utf-8') as f:
+    data = json.loads(f.read())
 
 st.set_page_config(
     page_title="Rau Cu Nam report",
@@ -14,6 +18,8 @@ st.set_page_config(
 )
 
 tab1, tab2 = st.tabs(["TRONG KỲ", "XUYÊN KỲ"])
+
+engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 
 with tab1:
     st.title("XEM BÁO CÁO THEO KỲ")
@@ -33,7 +39,10 @@ with tab1:
             with col2:
                 sld_order_report = st.selectbox("Kỳ báo cáo đơn hàng", order_data_name_list, index = len(order_data_name_list)-1)
             submitted = st.form_submit_button('Thực hiện')
-        df_finance = finalize_one_df_finance(sld_finance_report)
+        name = 'finance'
+        df_finance = pd.read_sql_table(name,engine)
+        df_finance.columns = data['completely_finance_df_base_cols']
+        # df_finance = finalize_one_df_finance(sld_finance_report)
         df_order = finalize_one_df_order(sld_order_report)
         st.markdown("### Tổng quan doanh thu, chi phí")
         hover = alt.selection_single(fields=["Sub-cate"],nearest=True,on="mouseover",empty="none")
