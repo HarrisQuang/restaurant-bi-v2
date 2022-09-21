@@ -42,7 +42,7 @@ with tab1:
         name = 'finance'
         df_finance = pd.read_sql_table(name,engine)
         df_finance.columns = data['completely_finance_df_base_cols']
-        # df_finance = finalize_one_df_finance(sld_finance_report)
+        df_finance = finalize_one_df_finance(sld_finance_report)
         df_order = finalize_one_df_order(sld_order_report)
         st.markdown("### Tổng quan doanh thu, chi phí")
         hover = alt.selection_single(fields=["Sub-cate"],nearest=True,on="mouseover",empty="none")

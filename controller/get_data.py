@@ -58,14 +58,21 @@ def create_df_finance(file_name):
         days.append(str(i + 1))
     if len(month) == 1:
         month = '0' + month
+    add_term = 'THU CHI ' + month + '/' + year
     date = []
+    term = []
+    date_number = []
     for day in days:
+        term.append(add_term)
         if len(day) == 1:
             tmp = '0'+ day + '/' + month + '/' + year
+            tmp2 = year + month + '0'+ day
         else:
             tmp = day + '/' + month + '/' + year
+            tmp2 = year + month + day
         date.append(tmp)
-    export_df = pd.DataFrame({'NGAY': date}) 
+        date_number.append(tmp2)
+    export_df = pd.DataFrame({'NGAY_NUMBER': date_number, 'KY': term, 'NGAY': date}) 
     for key in sheets:
         df1 = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name=int(sheets[key]), header=None)
         df2 = pd.DataFrame()
