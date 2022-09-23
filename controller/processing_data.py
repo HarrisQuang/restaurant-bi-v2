@@ -7,11 +7,14 @@ path = os.path.abspath('./controller')
 sys.path.append(path)
 from utils import *
 from get_data import *
+from sqlalchemy import create_engine, text
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
 
 msk_dish_name = data['mask_dish_name']
+
+engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 
 def processing_df_finance(final_df):
     finance_df_base_cols = data['finance_df_base_cols']
@@ -107,10 +110,16 @@ def processing_df_order(final_df):
     final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '/' + str(x.year))
     return final_df
 
-def finalize_one_df_finance(file_name):
+def export_one_df_finance(file_name):
     final_df = create_df_finance(file_name)['df']
     final_df = processing_df_finance(final_df)
     return final_df
+
+def finalize_one_df_finance(term):
+    result = engine.execute("SELECT * FROM finance WHERE ky = '%s'" % (term))
+    df = pd.DataFrame(result.fetchall())
+    df.columns = data['completely_finance_df_base_cols']
+    return df
 
 def finalize_one_df_finance_old(name):
     final_df = export_one_df(name)['df']
@@ -351,6 +360,6 @@ def get_statistic_osed(df):
     return final_df
 
 if __name__ == "__main__":
-    df = finalize_one_df_finance('THU CHI T5-22')
-    print(df.head())
+    df = finalize_one_df_finance('THU CHI 05/2022')
+    print(df)
     

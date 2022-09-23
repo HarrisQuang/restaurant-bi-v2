@@ -2,11 +2,14 @@ import numpy as np
 import gspread as gs 
 import pandas as pd 
 import json 
+from sqlalchemy import create_engine, text
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
 
 gc = gs.service_account(filename=data["gg_connect_file"])
+
+engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 
 def get_data_source_by_type(type):
     temp_arr = []
@@ -16,12 +19,14 @@ def get_data_source_by_type(type):
             temp_arr.append(el)
     return temp_arr
 
-def get_finance_data_name_list():
-    res = get_data_source_by_type('finance')
-    temp_arr = []
-    for el in res:
-        temp_arr.append(el['name'])
-    return temp_arr
+def get_finance_data_term_list():  
+    result = engine.execute("SELECT distinct ky FROM finance ORDER BY ky")
+    result = result.fetchall()
+    term_list = []
+    for i in range(len(result)):
+        term = result[i][0]
+        term_list.append(term)
+    return term_list
 
 def get_order_data_name_list():
     res = get_data_source_by_type('order')
@@ -56,9 +61,9 @@ def create_df_finance(file_name):
     days = []
     for i in range(data["days_in_month"][month]):
         days.append(str(i + 1))
+    add_term = 'THU CHI T' + month + '-' + year[-2:]
     if len(month) == 1:
         month = '0' + month
-    add_term = 'THU CHI ' + month + '/' + year
     date = []
     term = []
     date_number = []
@@ -186,5 +191,5 @@ def export_list_df_by_type(cycle, type, function):
     return df
 
 if __name__ == "__main__":
-    df = create_df_finance('THU CHI T5-22')['df']
-    print(df.head())
+    res = get_finance_data_term_list()
+    print(res)

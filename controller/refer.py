@@ -21,3 +21,5 @@ def read_dataset(name,engine):
 def list_datasets(engine):
     datasets = engine.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;")
     return datasets.fetchall()
+
+engine.execute("CREATE TABLE IF NOT EXISTS records (name text PRIMARY KEY, details text)")
