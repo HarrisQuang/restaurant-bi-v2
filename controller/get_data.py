@@ -3,6 +3,7 @@ import gspread as gs
 import pandas as pd 
 import json 
 from sqlalchemy import create_engine, text
+from datetime import date
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
@@ -27,6 +28,14 @@ def get_finance_data_term_list():
         term = result[i][0]
         term_list.append(term)
     return term_list
+
+def get_current_term_finance_db():
+    today = str(date.today())
+    current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
+    current_term = 'THU CHI T8-22'
+    result = engine.execute("SELECT ngay_number, ngay, doanh_thu FROM finance where ky = '%s'" % (current_term))
+    df = pd.DataFrame(result.fetchall())
+    return df
 
 def get_order_data_name_list():
     res = get_data_source_by_type('order')
@@ -77,7 +86,7 @@ def create_df_finance(file_name):
             tmp2 = year + month + day
         date.append(tmp)
         date_number.append(tmp2)
-    export_df = pd.DataFrame({'NGAY_NUMBER': date_number, 'KY': term, 'NGAY': date}) 
+    export_df = pd.DataFrame({'NGAY-NUMBER': date_number, 'KY': term, 'NGAY': date}) 
     for key in sheets:
         df1 = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name=int(sheets[key]), header=None)
         df2 = pd.DataFrame()
@@ -89,7 +98,6 @@ def create_df_finance(file_name):
         df2['NGAY'] = df2['NGAY'].apply(lambda x: x.strftime('%d/%m/%Y'))
         export_df = export_df.merge(df2, on = 'NGAY')
     final_report = {'year': year, 'month': month, 'type': type, 'df': export_df}
-    print(final_report['df'])
     return final_report
 
 def create_df_finance_old(ds):
@@ -191,5 +199,7 @@ def export_list_df_by_type(cycle, type, function):
     return df
 
 if __name__ == "__main__":
-    res = get_finance_data_term_list()
+    # res = get_finance_data_term_list()
+    res = get_current_term_finance_db()
+    print(res.dtypes)
     print(res)

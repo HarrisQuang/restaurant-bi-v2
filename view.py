@@ -36,7 +36,7 @@ with tab1:
             with col2:
                 sld_order_report = st.selectbox("Kỳ báo cáo đơn hàng", order_data_name_list, index = len(order_data_name_list)-1)
             submitted = st.form_submit_button('Thực hiện')
-        df_finance = finalize_one_df_finance(sld_finance_report)
+        df_finance = finalize_one_df_finance_by_term(sld_finance_report)
         df_order = finalize_one_df_order(sld_order_report)
         st.markdown("### Tổng quan doanh thu, chi phí")
         hover = alt.selection_single(fields=["Sub-cate"],nearest=True,on="mouseover",empty="none")

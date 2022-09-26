@@ -5,12 +5,14 @@ from getfilelistpy import getfilelist
 import requests
 from oauth2client.service_account import ServiceAccountCredentials
 import os, sys
-path = os.path.abspath('.')
-sys.path.append(path)
 from controller.processing_data import *
 from controller.get_data import *
 from sqlalchemy import create_engine, text
 import shutil
+from datetime import date
+
+path = os.path.abspath('.')
+sys.path.append(path)
 
 shutil.rmtree('temp')
 os.mkdir('temp', 0o755)
@@ -77,3 +79,8 @@ for name in file_name_migrate:
 
     query_stmnt = "INSERT INTO finance (NGAY_NUMBER, KY, NGAY, DOANH_THU, CHI_PHI, NET_SP_FOOD, GRAB, BAEMIN, CK_SP_FOOD, SP_FOOD, CK_GRAB, CK_BAEMIN, TAI_QUAN, PCT_BAEMIN, PCT_GRAB, PCT_SP_FOOD, PCT_TAI_QUAN) " + root % ist_val
     engine.execute(query_stmnt)
+    
+today = str(date.today())
+current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
+df = export_one_df_finance(current_term)
+

@@ -29,7 +29,6 @@ def processing_df_finance(final_df):
     final_df['PCT-GRAB'] = round(final_df['GRAB']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
     final_df['PCT-SP-FOOD'] = round(final_df['SP-FOOD']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2) 
     final_df['PCT-TAI-QUAN'] = round(final_df['TAI-QUAN']/(final_df['BAEMIN'] + final_df['GRAB'] + final_df['SP-FOOD'] + final_df['TAI-QUAN'])*100, 2)
-    print(final_df[['NGAY', 'DOANH-THU', 'GRAB', 'BAEMIN', 'SP-FOOD', 'CK-SP-FOOD', 'NET-SP-FOOD', 'TAI-QUAN', 'PCT-TAI-QUAN']])
     return final_df
 
 def processing_df_finance_old(final_df):
@@ -115,7 +114,7 @@ def export_one_df_finance(file_name):
     final_df = processing_df_finance(final_df)
     return final_df
 
-def finalize_one_df_finance(term):
+def finalize_one_df_finance_by_term(term):
     result = engine.execute("SELECT * FROM finance WHERE ky = '%s'" % (term))
     df = pd.DataFrame(result.fetchall())
     df.columns = data['completely_finance_df_base_cols']
@@ -359,7 +358,7 @@ def get_statistic_osed(df):
                                                'Median (SL hóa đơn)', 'Mode (SL hóa đơn)'])
     return final_df
 
-if __name__ == "__main__":
-    df = finalize_one_df_finance('THU CHI 05/2022')
-    print(df)
+# if __name__ == "__main__":
+#     df = finalize_one_df_finance('THU CHI 05/2022')
+#     print(df)
     
