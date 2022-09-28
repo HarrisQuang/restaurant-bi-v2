@@ -5,14 +5,13 @@ from getfilelistpy import getfilelist
 import requests
 from oauth2client.service_account import ServiceAccountCredentials
 import os, sys
+path = os.path.abspath('.')
+sys.path.append(path)
 from controller.processing_data import *
 from controller.get_data import *
 from sqlalchemy import create_engine, text
 import shutil
 from datetime import date
-
-path = os.path.abspath('.')
-sys.path.append(path)
 
 shutil.rmtree('temp')
 os.mkdir('temp', 0o755)
@@ -46,10 +45,14 @@ term_in_db = get_finance_data_term_list()
 
 file_name_migrate = []
 for i in file_name_list:
+    count = 0
     for j in term_in_db:
-        if i != j:
-            file_name_migrate.append(i)
-            
+        if i == j:
+            count += 1
+    if count == 0:
+        file_name_migrate.append(i)
+
+print(file_name_migrate)
 # Transfrom data in staging
 # -> Export 2 DFs (1 df for finance, 1 df for order) with columns as per requirement
 for name in file_name_migrate:
@@ -79,8 +82,43 @@ for name in file_name_migrate:
 
     query_stmnt = "INSERT INTO finance (NGAY_NUMBER, KY, NGAY, DOANH_THU, CHI_PHI, NET_SP_FOOD, GRAB, BAEMIN, CK_SP_FOOD, SP_FOOD, CK_GRAB, CK_BAEMIN, TAI_QUAN, PCT_BAEMIN, PCT_GRAB, PCT_SP_FOOD, PCT_TAI_QUAN) " + root % ist_val
     engine.execute(query_stmnt)
-    
+
 today = str(date.today())
 current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
+current_term = 'THU CHI T9-22'
 df = export_one_df_finance(current_term)
+if df != None:
+    ngay_number_from_source_max = int(df[df['DOANH-THU'] != 0]['NGAY-NUMBER'].max())
+    print(ngay_number_from_source_max)
+    print(type(ngay_number_from_source_max))
 
+    df1 = get_current_term_finance_db()
+    ngay_number_from_db_max = df1[df1['doanh_thu'] != 0]['ngay_number'].max()
+    print(ngay_number_from_db_max)
+    print(type(ngay_number_from_db_max))
+
+    ngay_number_list_to_add = []
+    if ngay_number_from_source_max > ngay_number_from_db_max:
+        count = ngay_number_from_source_max - ngay_number_from_db_max
+        for i in range(count):
+            ngay_number_from_db_max = ngay_number_from_db_max + 1
+            ngay_number_list_to_add.append(ngay_number_from_db_max)
+        print(df)
+        print(ngay_number_list_to_add)
+
+        new_dict = {}
+        for i in ngay_number_list_to_add:
+            record = list(df[df['NGAY-NUMBER'] == str(i)][['DOANH-THU', 'CHI-PHI', 'NET-SP-FOOD', 'GRAB', 'BAEMIN', 'CK-SP-FOOD', 'SP-FOOD', 'CK-GRAB', 'CK-BAEMIN', 'TAI-QUAN', 'PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN']].values[0])
+            record.append(i)
+            record = tuple(record)
+            new_dict[i] = record
+        print(new_dict)
+
+        part_stmt = "DOANH_THU = '%s', CHI_PHI = '%s', NET_SP_FOOD = '%s', GRAB = '%s', BAEMIN = '%s', CK_SP_FOOD = '%s', SP_FOOD = '%s', CK_GRAB = '%s', CK_BAEMIN = '%s', TAI_QUAN = '%s', PCT_BAEMIN = '%s', PCT_GRAB = '%s', PCT_SP_FOOD = '%s', PCT_TAI_QUAN = '%s' "
+
+        for i in new_dict.values():
+            print(i)
+            final_stmt = "UPDATE finance SET " + part_stmt + "WHERE ngay_number = '%s'"
+            final_stmt = final_stmt % i
+            print(final_stmt)
+            engine.execute(final_stmt)

@@ -110,10 +110,11 @@ def processing_df_order(final_df):
     return final_df
 
 def export_one_df_finance(file_name):
-    final_df = create_df_finance(file_name)['df']
-    final_df = processing_df_finance(final_df)
+    final_df = create_df_finance(file_name)
+    if final_df is not None:
+        final_df = processing_df_finance(final_df['df'])
     return final_df
-
+    
 def finalize_one_df_finance_by_term(term):
     result = engine.execute("SELECT * FROM finance WHERE ky = '%s'" % (term))
     df = pd.DataFrame(result.fetchall())

@@ -60,7 +60,10 @@ def get_data_source_by_name(name):
             return el
 
 def create_df_finance(file_name):
-    df = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name='README')
+    try:
+        df = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name='README')
+    except:
+        return None
     sheets = json.loads(df['sheets'].values[0])
     df_slice = json.loads(df['df_slice'].values[0])
     cols = json.loads(df['column_name'].values[0])
