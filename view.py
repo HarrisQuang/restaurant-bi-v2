@@ -172,7 +172,7 @@ with tab2:
             col3, col4 = st.columns(2)
             with col3:
                 options = st.multiselect('Chọn nguồn doanh thu', dthu_type)
-        
+            submitted = st.form_submit_button('Thực hiện')
         
         # st.markdown("### Món ăn")
         # order_cycle_list = get_cycle_list_by_type('order')

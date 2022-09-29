@@ -41,7 +41,11 @@ for el in dict(res)['fileList'][0]['files']:
         f.write(res.content)
     file_name_list.append(el['name'])
 
+print(f'File list from data source: {file_name_list}')
+
 term_in_db = get_finance_data_term_list()
+
+print(f'Term list from DB: {term_in_db}')
 
 file_name_migrate = []
 for i in file_name_list:
@@ -52,7 +56,8 @@ for i in file_name_list:
     if count == 0:
         file_name_migrate.append(i)
 
-print(file_name_migrate)
+print(f'{file_name_migrate}')
+
 # Transfrom data in staging
 # -> Export 2 DFs (1 df for finance, 1 df for order) with columns as per requirement
 for name in file_name_migrate:
