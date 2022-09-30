@@ -53,40 +53,50 @@ for count, el in enumerate(file_list_from_source):
         f.write(res.content)
     file_name_list.append(el['name'])
 
-line_2 = f'--> File list from data source: {file_name_list}'
-print(line_2)
-list_to_log.append(line_2)
+if len(file_name_list) != 0:
+    line_2 = f'--> File list from data source: {file_name_list}'
+    print(line_2)
+    list_to_log.append(line_2)
+else:
+    line_2 = "There's no data in data source"
+    print(line_2)
+    list_to_log.append(line_2)
 
-term_in_db = get_finance_data_term_list()
+term_in_db = get_order_data_term_list()
 
-# line_3 = f'Existing term list from DB: {term_in_db}'
-# print(line_3)
-# list_to_log.append(line_3)
+if len(term_in_db) != 0:
+    line_3 = f'Existing term list from DB: {term_in_db}'
+    print(line_3)
+    list_to_log.append(line_3)
+else:
+    line_3 = "There's no data in DB"
+    print(line_3)
+    list_to_log.append(line_3)
+    
+file_name_migrate = []
+for i in file_name_list:
+    count = 0
+    for j in term_in_db:
+        if i == j:
+            count += 1
+    if count == 0:
+        file_name_migrate.append(i)
 
-# file_name_migrate = []
-# for i in file_name_list:
-#     count = 0
-#     for j in term_in_db:
-#         if i == j:
-#             count += 1
-#     if count == 0:
-#         file_name_migrate.append(i)
-
-# if len(file_name_migrate) != 0:
-#     line_4 = f'--> Files need to be migrated: {file_name_migrate}'
-#     print(line_4)
-#     list_to_log.append(line_4)
-# else:
-#     line_4 = 'No new files need to be migrated'
-#     print(line_4)
-#     list_to_log.append(line_4)
+if len(file_name_migrate) != 0:
+    line_4 = f'--> Files need to be migrated: {file_name_migrate}'
+    print(line_4)
+    list_to_log.append(line_4)
+else:
+    line_4 = 'No new files need to be migrated'
+    print(line_4)
+    list_to_log.append(line_4)
 
 # Transfrom data in staging
 # -> Export 2 DFs (1 df for finance, 1 df for order) with columns as per requirement
-# for count, name in enumerate(file_name_migrate):
-#     print(f'[{count+1}/{len(file_name_migrate)}] Processing file: {name}')
-#     df = export_one_df_finance(name)
-
+for count, name in enumerate(file_name_migrate):
+    print(f'[{count+1}/{len(file_name_migrate)}] Processing file: {name}')
+    df = export_one_df_order(name)
+    print(df.head(10))
     # Load data into Postgres DB
     # -> 2 tables: 1 table for finance, 1 table for order
 #     root = "VALUES "

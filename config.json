@@ -44,7 +44,7 @@
     "finance_df_base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
     "completely_finance_df_base_cols": ["NGAY-NUMBER", "KY", "NGAY", "DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD", "SP-FOOD", "CK-GRAB", "CK-BAEMIN", "TAI-QUAN", "PCT-BAEMIN", "PCT-GRAB", "PCT-SP-FOOD", "PCT-TAI-QUAN"],
     "order_df_base_cols": ["Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
-    "completely_order_df_base_cols": ["Ngay_number", "Cycle", "Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
+    "completely_order_df_base_cols": ["ngay_number", "Cycle", "Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
     "various_dish_name": {"Gỏi 'Rau Củ Nâm' Đặt Biệt": "Gỏi 'Rau Củ Nấm' Đặt Biệt"} ,
     "overlap_dish_code": [["CSNC", "comsuonnuong", "COSUNUCH"], ["COTRSOTUOT", "R013"], ["HTX", "Hutieuxaoden"], ["LNL", "LNN"], ["LTL", "LTN", "LCN"], ["TD", "1"]],
     "mask_dish_name": {"Lẩu thái": "Lẩu tứ xuyên", "Lẩu nấm": "Lẩu tiềm ngũ sắc", "Hủ tiếu xào đen": "Hủ tiếu tương đen", "Cơm trộn": "Cơm ngũ vị",

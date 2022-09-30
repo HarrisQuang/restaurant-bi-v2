@@ -53,15 +53,25 @@ for count, el in enumerate(file_list_from_source):
         f.write(res.content)
     file_name_list.append(el['name'])
 
-line_2 = f'--> File list from data source: {file_name_list}'
-print(line_2)
-list_to_log.append(line_2)
+if len(file_name_list) != 0:
+    line_2 = f'--> File list from data source: {file_name_list}'
+    print(line_2)
+    list_to_log.append(line_2)
+else:
+    line_2 = "There's no data in data source"
+    print(line_2)
+    list_to_log.append(line_2)
 
 term_in_db = get_finance_data_term_list()
 
-line_3 = f'Existing term list from DB: {term_in_db}'
-print(line_3)
-list_to_log.append(line_3)
+if len(term_in_db) != 0:
+    line_3 = f'Existing term list from DB: {term_in_db}'
+    print(line_3)
+    list_to_log.append(line_3)
+else:
+    line_3 = "There's no data in DB"
+    print(line_3)
+    list_to_log.append(line_3)
 
 file_name_migrate = []
 for i in file_name_list:

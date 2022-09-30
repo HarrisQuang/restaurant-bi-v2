@@ -21,7 +21,7 @@ def get_data_source_by_type(type):
     return temp_arr
 
 def get_finance_data_term_list():  
-    result = engine.execute("SELECT distinct ky FROM finance ORDER BY ky")
+    result = engine.execute("SELECT distinct ky FROM order ORDER BY ky")
     result = result.fetchall()
     term_list = []
     for i in range(len(result)):
@@ -37,20 +37,13 @@ def get_current_term_finance_db():
     return df
 
 def get_order_data_term_list():  
-    result = engine.execute("SELECT distinct ky FROM finance ORDER BY ky")
+    result = engine.execute("SELECT distinct ky FROM orders ORDER BY ky")
     result = result.fetchall()
     term_list = []
     for i in range(len(result)):
-        term = 'THU CHI T' + str(result[i][0])
+        term = 'ORDER T' + str(result[i][0])
         term_list.append(term)
     return term_list
-
-def get_order_data_name_list():
-    res = get_data_source_by_type('order')
-    temp_arr = []
-    for el in res:
-        temp_arr.append(el['name'])
-    return temp_arr
 
 def get_cycle_list_by_type(type):
     res = get_data_source_by_type(type)
@@ -69,7 +62,7 @@ def get_data_source_by_name(name):
 
 def create_df_finance(file_name):
     try:
-        df = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name='README')
+        df = pd.read_excel(f'temp/finance/{file_name}.xlsx', sheet_name='README')
     except:
         return None
     sheets = json.loads(df['sheets'].values[0])
@@ -99,7 +92,7 @@ def create_df_finance(file_name):
         date_number.append(tmp2)
     export_df = pd.DataFrame({'NGAY-NUMBER': date_number, 'KY': term, 'NGAY': date}) 
     for key in sheets:
-        df1 = pd.read_excel(f'temp/{file_name}.xlsx', sheet_name=int(sheets[key]), header=None)
+        df1 = pd.read_excel(f'temp/finance/{file_name}.xlsx', sheet_name=int(sheets[key]), header=None)
         df2 = pd.DataFrame()
         for i in range(len(df_slice[sheets[key]]) - 1):
             df2[i+1] = df1.iloc[df_slice[sheets[key]][0][0]:df_slice[sheets[key]][0][1], df_slice[sheets[key]][i+1]]
@@ -109,6 +102,23 @@ def create_df_finance(file_name):
         df2['NGAY'] = df2['NGAY'].apply(lambda x: x.strftime('%d/%m/%Y'))
         export_df = export_df.merge(df2, on = 'NGAY')
     final_report = {'year': year, 'month': month, 'type': type, 'df': export_df}
+    return final_report
+
+def create_df_order(file_name):
+    try:
+        df = pd.read_excel(f'temp/order/{file_name}.xlsx', sheet_name='README')
+    except:
+        return None
+    type = str(df['type'].values[0])
+    year = str(df['Year'].values[0])
+    month = str(df['Month'].values[0])
+    header_row_index = int(df['header_row_index'].values[0])
+    df = pd.read_excel(f'temp/order/{file_name}.xlsx', sheet_name=0, header=None)
+    df = df.iloc[header_row_index:]
+    df.columns = df.iloc[0]
+    df = df[2:]
+    df = df[data['order_df_base_cols']]
+    final_report = {'year': year, 'month': month, 'type': type, 'df': df}
     return final_report
 
 def create_df_finance_old(ds):
@@ -139,20 +149,6 @@ def create_df_finance_old(ds):
         df2.columns = cols[sheets[key]]
         export_df = export_df.merge(df2, on = 'NGAY')
     final_report = {'year': year, 'month': month, 'type': type, 'df': export_df}
-    return final_report
-
-def create_df_order(ds):
-    type = ds["type"]
-    year = ds["Year"]
-    month = ds["Month"]
-    sh = gc.open_by_url(ds['link'])
-    ws = sh.get_worksheet(0)
-    df = pd.DataFrame(ws.get_values())
-    df = df.iloc[ds['header_row_index']:]
-    df.columns = df.iloc[0]
-    df = df[2:]
-    df = df[data['order_df_base_cols']]
-    final_report = {'year': year, 'month': month, 'type': type, 'df': df}
     return final_report
 
 def export_one_df(name):

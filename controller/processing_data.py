@@ -100,19 +100,24 @@ def processing_df_order(final_df):
     final_df.dropna(subset = ['Mã món'], axis = 0, inplace=True)
     final_df['Ngày'].replace('', np.nan, inplace=True)
     final_df.dropna(subset = ['Ngày'], axis = 0, inplace=True)
-    final_df['Đơn giá'] = transform_col(final_df['Đơn giá'])
-    final_df['Doanh thu'] = transform_col(final_df['Doanh thu'])
-    final_df['SL bán'] = final_df['SL bán'].apply(lambda x: subtring_from_comma(x)).astype(float, copy=True)
+    final_df['SL bán'] = final_df['SL bán'].astype(float, copy=True)
     final_df[['Đơn giá', 'Doanh thu']] = final_df[['Đơn giá', 'Doanh thu']].astype(float, copy=True)
-    final_df['Ngày'] = final_df['Ngày'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
-    final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '-' + str(x.year))
+    final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '-' + str(x.year)[2:])
+    final_df['ngay_number'] = final_df['Ngày'].apply(lambda x: x.strftime('%Y%m%d')).astype(int, copy=True)
+    final_df = final_df[data['completely_order_df_base_cols']]
     return final_df
 
 def export_one_df_finance(file_name):
     final_df = create_df_finance(file_name)
     if final_df is not None:
         final_df = processing_df_finance(final_df['df'])
+    return final_df
+
+def export_one_df_order(file_name):
+    final_df = create_df_order(file_name)
+    if final_df is not None:
+        final_df = processing_df_order(final_df['df'])
     return final_df
     
 def finalize_one_df_finance_by_term(term):
@@ -121,16 +126,6 @@ def finalize_one_df_finance_by_term(term):
     df = pd.DataFrame(result.fetchall())
     df.columns = data['completely_finance_df_base_cols']
     return df
-
-def finalize_one_df_finance_old(name):
-    final_df = export_one_df(name)['df']
-    final_df = processing_df_finance(final_df)
-    return final_df
-
-def finalize_one_df_order(name):
-    final_df = export_one_df(name)['df']
-    final_df = processing_df_order(final_df)
-    return final_df
 
 def finalize_list_df_finance_by_cycle(cycle):
     df = export_list_df_by_type(cycle, 'finance', create_df_finance)
@@ -361,6 +356,6 @@ def get_statistic_osed(df):
     return final_df
 
 # if __name__ == "__main__":
-#     df = finalize_one_df_finance('THU CHI 05/2022')
-#     print(df)
+#     df = export_one_df_order('ORDER T4-22')
+#     print(df.head(10))
     

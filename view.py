@@ -28,7 +28,7 @@ with tab1:
     with placeholder.container():
         st.markdown("### Chọn kỳ báo cáo")
         finance_data_name_list = get_finance_data_term_list()
-        order_data_name_list = get_order_data_name_list()
+        order_data_name_list = get_order_data_term_list()
         with st.form(key='form-chon-ky-bao-cao'):
             col1, col2 = st.columns(2)
             with col1:
