@@ -106,7 +106,7 @@ def processing_df_order(final_df):
     final_df[['Đơn giá', 'Doanh thu']] = final_df[['Đơn giá', 'Doanh thu']].astype(float, copy=True)
     final_df['Ngày'] = final_df['Ngày'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
-    final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '/' + str(x.year))
+    final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '-' + str(x.year))
     return final_df
 
 def export_one_df_finance(file_name):
@@ -116,6 +116,7 @@ def export_one_df_finance(file_name):
     return final_df
     
 def finalize_one_df_finance_by_term(term):
+    term = term[9:]
     result = engine.execute("SELECT * FROM finance WHERE ky = '%s'" % (term))
     df = pd.DataFrame(result.fetchall())
     df.columns = data['completely_finance_df_base_cols']

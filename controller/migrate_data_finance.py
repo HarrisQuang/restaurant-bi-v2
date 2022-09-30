@@ -14,12 +14,14 @@ import shutil
 from datetime import datetime, date
 import time
 
-now = datetime.now()
-now = now.strftime("%d_%m_%Y %H_%M_%S")
+now = datetime.now().strftime("%d_%m_%Y %H_%M_%S")
 
 start = time.time()
-shutil.rmtree('temp')
-os.mkdir('temp', 0o755)
+try:
+    shutil.rmtree('temp/finance/')
+except:
+    pass
+os.mkdir('temp/finance/', 0o755)
 
 list_to_log = []
 list_to_log.append(f'Datetime: {now}')
@@ -47,7 +49,7 @@ for count, el in enumerate(file_list_from_source):
     print(f"[{count+1}/{len(file_list_from_source)}] Processing the file {el['name']}")
     url = "https://www.googleapis.com/drive/v3/files/" + el['id'] + "/export?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet"
     res = requests.get(url, headers={"Authorization": "Bearer " + access_token})
-    with open(f"temp/{el['name']}.xlsx", 'wb') as f:
+    with open(f"temp/finance/{el['name']}.xlsx", 'wb') as f:
         f.write(res.content)
     file_name_list.append(el['name'])
 
@@ -111,7 +113,6 @@ for count, name in enumerate(file_name_migrate):
 
 today = str(date.today())
 current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
-current_term = 'THU CHI T9-22'
 df = export_one_df_finance(current_term)
 if df != None:
     ngay_number_from_source_max = int(df[df['DOANH-THU'] != 0]['NGAY-NUMBER'].max())
@@ -137,14 +138,9 @@ if df != None:
             record = list(df[df['NGAY-NUMBER'] == str(i)][['DOANH-THU', 'CHI-PHI', 'NET-SP-FOOD', 'GRAB', 'BAEMIN', 'CK-SP-FOOD', 'SP-FOOD', 'CK-GRAB', 'CK-BAEMIN', 'TAI-QUAN', 'PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN']].values[0])
             record.append(i)
             record = tuple(record)
-            # new_dict[i] = record
             final_stmt = "UPDATE finance SET " + part_stmt + "WHERE ngay_number = '%s'"
             final_stmt = final_stmt % record
             engine.execute(final_stmt)
-        # for i in new_dict.values():
-        #     final_stmt = "UPDATE finance SET " + part_stmt + "WHERE ngay_number = '%s'"
-        #     final_stmt = final_stmt % i
-        #     engine.execute(final_stmt)
     else:
         line_5 = "There's no any new records needed to be fetched"
         print(line_5)
@@ -158,7 +154,7 @@ line_6 = f'Whole process takes {end - start}'
 print(line_6)
 list_to_log.append(line_6)
 
-with open(f'log/{now}.txt', 'w') as f:
+with open(f'log/finance_{now}.txt', 'w') as f:
     for line in list_to_log:
         f.write(line)
         f.write('\n')

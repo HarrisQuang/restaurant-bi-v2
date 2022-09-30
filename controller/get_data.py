@@ -25,17 +25,25 @@ def get_finance_data_term_list():
     result = result.fetchall()
     term_list = []
     for i in range(len(result)):
-        term = result[i][0]
+        term = 'THU CHI T' + str(result[i][0])
         term_list.append(term)
     return term_list
 
 def get_current_term_finance_db():
     today = str(date.today())
     current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
-    current_term = 'THU CHI T8-22'
     result = engine.execute("SELECT ngay_number, ngay, doanh_thu FROM finance where ky = '%s'" % (current_term))
     df = pd.DataFrame(result.fetchall())
     return df
+
+def get_order_data_term_list():  
+    result = engine.execute("SELECT distinct ky FROM finance ORDER BY ky")
+    result = result.fetchall()
+    term_list = []
+    for i in range(len(result)):
+        term = 'THU CHI T' + str(result[i][0])
+        term_list.append(term)
+    return term_list
 
 def get_order_data_name_list():
     res = get_data_source_by_type('order')
@@ -73,7 +81,7 @@ def create_df_finance(file_name):
     days = []
     for i in range(data["days_in_month"][month]):
         days.append(str(i + 1))
-    add_term = 'THU CHI T' + month + '-' + year[-2:]
+    add_term =  month + '-' + year[-2:]
     if len(month) == 1:
         month = '0' + month
     date = []

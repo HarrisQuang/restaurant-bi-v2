@@ -1,20 +1,6 @@
 {
     "data_source": [
         {
-            "id": 1,
-            "Year": "2022",
-            "Month": "05",
-            "type": "finance",
-            "source": "remote",
-            "name": "THU CHI T5-22",
-            "link": "https://docs.google.com/spreadsheets/d/1mU0VhTKePNyaVZlfM6CgxdczAHMVXm0nKOkafnoM7g0/edit?usp=sharing",
-            "detail": {
-                "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
-                "df_slice": {"0": [[3,34], 1, 2], "2": [[2,33], 1, 2], "3": [[2,33], 0, 5, 6, 7], "4": [[1,32], 0, 1]},
-                "column_name": {"0": ["ngay", "doanh_thu"], "2": ["NGAY", "CHI-PHI"], "3": ["NGAY", "NET-SP-FOOD", "GRAB", "BAEMIN"], "4": ["NGAY","CK-SP-FOOD"]}
-            }
-        },
-        {
             "id": 2,
             "Year": "2022",
             "Month": "04",
@@ -23,48 +9,6 @@
             "name": "Báo cáo đơn hàng tháng 4/22",
             "link": "https://docs.google.com/spreadsheets/d/1C8oxPxMBpj7vn_BTUfHOQHZNhODOeuGt73suF4ZnOU0/edit?usp=sharing",
             "header_row_index": 8
-        },
-        {
-            "id": 3,
-            "Year": "2022",
-            "Month": "06",
-            "type": "finance",
-            "source": "remote",
-            "name": "THU CHI T6-22",
-            "link": "https://docs.google.com/spreadsheets/d/1U8i87_OUlsEpwqKXMl3EeFOMu6tNHwBt-349pcfByjA/edit?usp=sharing",
-            "detail": {
-                "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
-                "df_slice": {"0": [[3,33], 1, 2], "2": [[2,32], 1, 2], "3": [[2,32], 0, 5, 6, 7], "4": [[1,31], 0, 1]},
-                "column_name": {"0": ["NGAY", "DOANH-THU"], "2": ["ngay", "chi_phi"], "3": ["ngay", "net_sp_food", "grab", "baemin"], "4": ["ngay","ck_sp_food"]}
-            }
-        },
-        {
-            "id": 4,
-            "Year": "2022",
-            "Month": "07",
-            "type": "finance",
-            "source": "remote",
-            "name": "THU CHI T7-22",
-            "link": "https://docs.google.com/spreadsheets/d/1kEJgXC_g05X_hGQxPVIHDAnofY08AiTszT3XkCTMgrc/edit?usp=sharing",
-            "detail": {
-                "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
-                "df_slice": {"0": [[3,34], 1, 2], "2": [[2,33], 1, 2], "3": [[2,33], 0, 5, 6, 7], "4": [[1,29], 0, 1]},
-                "column_name": {"0": ["NGAY", "DOANH-THU"], "2": ["NGAY", "CHI-PHI"], "3": ["NGAY", "NET-SP-FOOD", "GRAB", "BAEMIN"], "4": ["NGAY","CK-SP-FOOD"]}
-            }
-        },
-        {
-            "id": 5,
-            "Year": "2022",
-            "Month": "08",
-            "type": "finance",
-            "source": "remote",
-            "name": "THU CHI T8-22",
-            "link": "https://docs.google.com/spreadsheets/d/1H2ZFSyvUH4s_XAzE_MMxEYmloj_6IqMM3evIYSpaiU8/edit?usp=sharing",
-            "detail": {
-                "sheets": {"DOANH-THU-NGAY": "0", "CHI-PHI-NGAY": "2", "GRAB,BAEMIN,SP-FOOD": "3", "CK-SP-FOOD": "4"},
-                "df_slice": {"0": [[3,34], 1, 2], "2": [[2,33], 1, 2], "3": [[2,33], 0, 5, 6, 7], "4": [[1,32], 0, 1]},
-                "column_name": {"0": ["NGAY", "DOANH-THU"], "2": ["NGAY", "CHI-PHI"], "3": ["NGAY", "NET-SP-FOOD", "GRAB", "BAEMIN"], "4": ["NGAY","CK-SP-FOOD"]}
-            }
         },
         {
             "id": 6,
@@ -100,6 +44,7 @@
     "finance_df_base_cols": ["DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD"],
     "completely_finance_df_base_cols": ["NGAY-NUMBER", "KY", "NGAY", "DOANH-THU", "CHI-PHI", "NET-SP-FOOD", "GRAB", "BAEMIN", "CK-SP-FOOD", "SP-FOOD", "CK-GRAB", "CK-BAEMIN", "TAI-QUAN", "PCT-BAEMIN", "PCT-GRAB", "PCT-SP-FOOD", "PCT-TAI-QUAN"],
     "order_df_base_cols": ["Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
+    "completely_order_df_base_cols": ["Ngay_number", "Cycle", "Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
     "various_dish_name": {"Gỏi 'Rau Củ Nâm' Đặt Biệt": "Gỏi 'Rau Củ Nấm' Đặt Biệt"} ,
     "overlap_dish_code": [["CSNC", "comsuonnuong", "COSUNUCH"], ["COTRSOTUOT", "R013"], ["HTX", "Hutieuxaoden"], ["LNL", "LNN"], ["LTL", "LTN", "LCN"], ["TD", "1"]],
     "mask_dish_name": {"Lẩu thái": "Lẩu tứ xuyên", "Lẩu nấm": "Lẩu tiềm ngũ sắc", "Hủ tiếu xào đen": "Hủ tiếu tương đen", "Cơm trộn": "Cơm ngũ vị",
