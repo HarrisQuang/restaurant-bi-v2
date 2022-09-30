@@ -15,7 +15,7 @@ from datetime import datetime, date
 import time
 
 now = datetime.now()
-now = now.strftime("%d-%m-%Y %H-%M-%S")
+now = now.strftime("%d_%m_%Y %H_%M_%S")
 
 start = time.time()
 shutil.rmtree('temp')
@@ -73,7 +73,7 @@ for i in file_name_list:
 if len(file_name_migrate) != 0:
     line_4 = f'--> Files need to be migrated: {file_name_migrate}'
     print(line_4)
-    list_to_log.append(line_3)
+    list_to_log.append(line_4)
 else:
     line_4 = 'No new files need to be migrated'
     print(line_4)

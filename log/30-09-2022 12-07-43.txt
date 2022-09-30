@@ -1,0 +1,6 @@
+Datetime: 30-09-2022 12-07-43
+--> File list from data source: ['THU CHI T5-22', 'THU CHI T6-22', 'THU CHI T7-22', 'THU CHI T8-22']
+Existing term list from DB: []
+Existing term list from DB: []
+The current term THU CHI T9-22 is not available
+Whole process takes 12.938527345657349
