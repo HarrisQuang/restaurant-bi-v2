@@ -11,11 +11,18 @@ from controller.processing_data import *
 from controller.get_data import *
 from sqlalchemy import create_engine, text
 import shutil
-from datetime import date
+from datetime import datetime, date
+import time
 
+now = datetime.now()
+now = now.strftime("%d-%m-%Y %H-%M-%S")
+
+start = time.time()
 shutil.rmtree('temp')
 os.mkdir('temp', 0o755)
 
+list_to_log = []
+list_to_log.append(f'Datetime: {now}')
 print('Start getting files from data source')
 engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 
@@ -44,11 +51,15 @@ for count, el in enumerate(file_list_from_source):
         f.write(res.content)
     file_name_list.append(el['name'])
 
-print(f'File list from data source: {file_name_list}')
+line_2 = f'--> File list from data source: {file_name_list}'
+print(line_2)
+list_to_log.append(line_2)
 
 term_in_db = get_finance_data_term_list()
 
-print(f'Existing term list from DB: {term_in_db}')
+line_3 = f'Existing term list from DB: {term_in_db}'
+print(line_3)
+list_to_log.append(line_3)
 
 file_name_migrate = []
 for i in file_name_list:
@@ -60,9 +71,13 @@ for i in file_name_list:
         file_name_migrate.append(i)
 
 if len(file_name_migrate) != 0:
-    print(f'Files need to be migrated: {file_name_migrate}')
+    line_4 = f'--> Files need to be migrated: {file_name_migrate}'
+    print(line_4)
+    list_to_log.append(line_3)
 else:
-    print('No new files need to be migrated')
+    line_4 = 'No new files need to be migrated'
+    print(line_4)
+    list_to_log.append(line_4)
 
 # Transfrom data in staging
 # -> Export 2 DFs (1 df for finance, 1 df for order) with columns as per requirement
@@ -94,7 +109,6 @@ for count, name in enumerate(file_name_migrate):
     query_stmnt = "INSERT INTO finance (NGAY_NUMBER, KY, NGAY, DOANH_THU, CHI_PHI, NET_SP_FOOD, GRAB, BAEMIN, CK_SP_FOOD, SP_FOOD, CK_GRAB, CK_BAEMIN, TAI_QUAN, PCT_BAEMIN, PCT_GRAB, PCT_SP_FOOD, PCT_TAI_QUAN) " + root % ist_val
     engine.execute(query_stmnt)
 
-
 today = str(date.today())
 current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
 current_term = 'THU CHI T9-22'
@@ -112,7 +126,9 @@ if df != None:
             ngay_number_from_db_max = ngay_number_from_db_max + 1
             ngay_number_list_to_add.append(ngay_number_from_db_max)
         
-        print(f'List of days need to be appended: {ngay_number_list_to_add}')
+        line_5 = f'List of days need to be appended: {ngay_number_list_to_add}'
+        print(line_5)
+        list_to_log.append(line_5)
         
         part_stmt = "DOANH_THU = '%s', CHI_PHI = '%s', NET_SP_FOOD = '%s', GRAB = '%s', BAEMIN = '%s', CK_SP_FOOD = '%s', SP_FOOD = '%s', CK_GRAB = '%s', CK_BAEMIN = '%s', TAI_QUAN = '%s', PCT_BAEMIN = '%s', PCT_GRAB = '%s', PCT_SP_FOOD = '%s', PCT_TAI_QUAN = '%s' "
         new_dict = {}
@@ -130,6 +146,19 @@ if df != None:
         #     final_stmt = final_stmt % i
         #     engine.execute(final_stmt)
     else:
-        print("There's no any new records needed to be fetched")
+        line_5 = "There's no any new records needed to be fetched"
+        print(line_5)
+        list_to_log.append(line_5)
 else:
-    print(f"The current term {current_term} is not available")
+    line_5 = f"The current term {current_term} is not available"
+    print(line_5)
+    list_to_log.append(line_5)
+end = time.time()
+line_6 = f'Whole process takes {end - start}'
+print(line_6)
+list_to_log.append(line_6)
+
+with open(f'log/{now}.txt', 'w') as f:
+    for line in list_to_log:
+        f.write(line)
+        f.write('\n')

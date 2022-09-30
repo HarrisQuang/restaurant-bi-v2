@@ -1,0 +1,6 @@
+Datetime: 30-09-2022 12-04-56
+--> File list from data source: ['THU CHI T5-22', 'THU CHI T6-22', 'THU CHI T7-22', 'THU CHI T8-22']
+Existing term list from DB: ['THU CHI T5-22', 'THU CHI T6-22', 'THU CHI T7-22', 'THU CHI T8-22']
+No new files need to be migrated
+The current term THU CHI T9-22 is not available
+Whole process takes 7.00212025642395
