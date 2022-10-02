@@ -122,9 +122,9 @@ for count, name in enumerate(file_name_migrate):
     engine.execute(query_stmnt)
 
 today = str(date.today())
-current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
+current_term = 'THU CHI ' + today[5:7] + '-' + today[2:4]
 df = export_one_df_finance(current_term)
-if df != None:
+if df is not None:
     ngay_number_from_source_max = int(df[df['DOANH-THU'] != 0]['NGAY-NUMBER'].max())
 
     df1 = get_current_term_finance_db()

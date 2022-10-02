@@ -1,0 +1,6 @@
+Datetime: 02_10_2022 05_53_31
+--> File list from data source: ['THU CHI 05-22', 'THU CHI 06-22', 'THU CHI 07-22', 'THU CHI 08-22']
+There's no data in DB
+--> Files need to be migrated: ['THU CHI 05-22', 'THU CHI 06-22', 'THU CHI 07-22', 'THU CHI 08-22']
+The current term THU CHI 10-22 is not available
+Whole process takes 15.239657163619995

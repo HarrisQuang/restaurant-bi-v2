@@ -6,10 +6,9 @@ import os, sys
 from controller.processing_data import *
 from controller.get_data import *
 
-# today = date.today()
-# today = str(today)
-# print(type(today))
-# print(today[2:4], today[6:7])
+today = date.today()
+today = str(today)
+# print(today[2:4], today[5:7])
 # print("Today's date:", today)
 
 
@@ -30,8 +29,8 @@ from controller.get_data import *
 # print(type(str(df['Month'].values[0])))
 # print(type(res['DOANH-THU-NGAY']))
 
-today = str(date.today())
-# current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
+# today = str(date.today())
+# current_term = 'THU CHI T' + today[5:7] + '-' + today[2:4]
 # current_term = 'THU CHI T8-22'
 # df = export_one_df_finance(current_term)
 # ngay_number_from_source_max = int(df[df['DOANH-THU'] != 0]['NGAY-NUMBER'].max())
@@ -75,3 +74,36 @@ today = str(date.today())
 #     engine.execute(final_stmt)
 
 print(today)
+print(type(today))
+
+date = datetime(2022, 9, 30)
+date = str(date)
+print(date)
+
+
+#################################################################
+
+# df = export_one_df_order('ORDER 04-22')
+
+# Load data into Postgres DB
+# -> 2 tables: 1 table for finance, 1 table for order
+# root = "VALUES "
+# loop = "('%s','%s','%s','%s','%s','%s','%s','%s','%s')"
+# for i in range(df.shape[0]):
+#     if i == 0:
+#         root = root + loop
+#     else:
+#         root = root + ", " + loop
+
+# ist_val = []
+# for id, row in df.iterrows():
+#     for i, val in enumerate(row):
+#         try:
+#             ist_val.append((val.strip()))
+#         except:
+#             ist_val.append(val)
+        
+# ist_val = tuple(ist_val)
+
+# query_stmnt = "INSERT INTO orders (ngay_number, ky, ngay, so_hoa_don, ma_mon, ten_mon, sl_ban, don_gia, doanh_thu) " + root % ist_val
+# engine.execute(query_stmnt)

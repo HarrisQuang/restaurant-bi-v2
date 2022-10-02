@@ -1,0 +1,6 @@
+Datetime: 01_10_2022 21_48_15
+--> File list from data source: ['ORDER T10-22', 'ORDER T4-22']
+Existing term list from DB: ['ORDER T4-22']
+--> Files need to be migrated: ['ORDER T10-22']
+The current term ORDER T0-22 is not available
+Whole process takes 9.11391544342041

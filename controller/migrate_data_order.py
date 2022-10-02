@@ -96,76 +96,90 @@ else:
 for count, name in enumerate(file_name_migrate):
     print(f'[{count+1}/{len(file_name_migrate)}] Processing file: {name}')
     df = export_one_df_order(name)
-    print(df.head(10))
+
     # Load data into Postgres DB
     # -> 2 tables: 1 table for finance, 1 table for order
-#     root = "VALUES "
-#     loop = "('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"
-#     for i in range(df.shape[0]):
-#         if i == 0:
-#             root = root + loop
-#         else:
-#             root = root + ", " + loop
+    root = "VALUES "
+    loop = "('%s','%s','%s','%s','%s','%s','%s','%s','%s')"
+    for i in range(df.shape[0]):
+        if i == 0:
+            root = root + loop
+        else:
+            root = root + ", " + loop
 
-#     ist_val = []
-#     for id, row in df.iterrows():
-#         for i, val in enumerate(row):
-#             try:
-#                 ist_val.append((val.strip()))
-#             except:
-#                 ist_val.append(val)
+    ist_val = []
+    for id, row in df.iterrows():
+        for i, val in enumerate(row):
+            try:
+                ist_val.append((val.strip()))
+            except:
+                ist_val.append(val)
             
-#     ist_val = tuple(ist_val)
-#     print(ist_val)
+    ist_val = tuple(ist_val)
 
-#     query_stmnt = "INSERT INTO finance (NGAY_NUMBER, KY, NGAY, DOANH_THU, CHI_PHI, NET_SP_FOOD, GRAB, BAEMIN, CK_SP_FOOD, SP_FOOD, CK_GRAB, CK_BAEMIN, TAI_QUAN, PCT_BAEMIN, PCT_GRAB, PCT_SP_FOOD, PCT_TAI_QUAN) " + root % ist_val
-#     engine.execute(query_stmnt)
+    query_stmnt = "INSERT INTO orders (ngay_number, ky, ngay, so_hoa_don, ma_mon, ten_mon, sl_ban, don_gia, doanh_thu) " + root % ist_val
+    engine.execute(query_stmnt)
 
-# today = str(date.today())
-# current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
-# current_term = 'THU CHI T9-22'
-# df = export_one_df_finance(current_term)
-# if df != None:
-#     ngay_number_from_source_max = int(df[df['DOANH-THU'] != 0]['NGAY-NUMBER'].max())
+today = str(date.today())
+current_term = 'ORDER ' + today[5:7] + '-' + today[2:4]
+df = export_one_df_order(current_term)
+if df is not None:
+    ngay_number_from_source_max = int(df['ngay_number'].max())
 
-#     df1 = get_current_term_finance_db()
-#     ngay_number_from_db_max = df1[df1['doanh_thu'] != 0]['ngay_number'].max()
+    df1 = get_current_term_order_db()
+    ngay_number_from_db_max = df1['ngay_number'].max()
 
-#     ngay_number_list_to_add = []
-#     if ngay_number_from_source_max > ngay_number_from_db_max:
-#         count = ngay_number_from_source_max - ngay_number_from_db_max
-#         for i in range(count):
-#             ngay_number_from_db_max = ngay_number_from_db_max + 1
-#             ngay_number_list_to_add.append(ngay_number_from_db_max)
+    ngay_number_list_to_add = []
+    if ngay_number_from_source_max > ngay_number_from_db_max:
+        count = ngay_number_from_source_max - ngay_number_from_db_max
+        for i in range(count):
+            ngay_number_from_db_max = ngay_number_from_db_max + 1
+            ngay_number_list_to_add.append(ngay_number_from_db_max)
         
-#         line_5 = f'List of days need to be appended: {ngay_number_list_to_add}'
-#         print(line_5)
-#         list_to_log.append(line_5)
+        line_5 = f'List of days need to be appended: {ngay_number_list_to_add}'
+        print(line_5)
+        list_to_log.append(line_5)
         
-#         part_stmt = "DOANH_THU = '%s', CHI_PHI = '%s', NET_SP_FOOD = '%s', GRAB = '%s', BAEMIN = '%s', CK_SP_FOOD = '%s', SP_FOOD = '%s', CK_GRAB = '%s', CK_BAEMIN = '%s', TAI_QUAN = '%s', PCT_BAEMIN = '%s', PCT_GRAB = '%s', PCT_SP_FOOD = '%s', PCT_TAI_QUAN = '%s' "
-#         new_dict = {}
-#         for count, i in enumerate(ngay_number_list_to_add):
-#             print(f'[{count + 1}/{len(ngay_number_list_to_add)}] The ngay_number {i} are adding')
-#             record = list(df[df['NGAY-NUMBER'] == str(i)][['DOANH-THU', 'CHI-PHI', 'NET-SP-FOOD', 'GRAB', 'BAEMIN', 'CK-SP-FOOD', 'SP-FOOD', 'CK-GRAB', 'CK-BAEMIN', 'TAI-QUAN', 'PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN']].values[0])
-#             record.append(i)
-#             record = tuple(record)
-#             final_stmt = "UPDATE finance SET " + part_stmt + "WHERE ngay_number = '%s'"
-#             final_stmt = final_stmt % record
-#             engine.execute(final_stmt)
-#     else:
-#         line_5 = "There's no any new records needed to be fetched"
-#         print(line_5)
-#         list_to_log.append(line_5)
-# else:
-#     line_5 = f"The current term {current_term} is not available"
-#     print(line_5)
-#     list_to_log.append(line_5)
-# end = time.time()
-# line_6 = f'Whole process takes {end - start}'
-# print(line_6)
-# list_to_log.append(line_6)
+        part_df = []
+        for ngay_number in ngay_number_list_to_add:
+            new_df = df[df['ngay_number'] == ngay_number]
+            part_df.append(new_df)
+        final_df = pd.concat(part_df, axis=0)           
+            
+        root = "VALUES "
+        loop = "('%s','%s','%s','%s','%s','%s','%s','%s','%s')"
+        for i in range(final_df.shape[0]):
+            if i == 0:
+                root = root + loop
+            else:
+                root = root + ", " + loop
 
-# with open(f'log/order_{now}.txt', 'w') as f:
-#     for line in list_to_log:
-#         f.write(line)
-#         f.write('\n')
+        ist_val = []
+        for id, row in final_df.iterrows():
+            for i, val in enumerate(row):
+                try:
+                    ist_val.append((val.strip()))
+                except:
+                    ist_val.append(val)
+                
+        ist_val = tuple(ist_val)
+
+        query_stmnt = "INSERT INTO orders (ngay_number, ky, ngay, so_hoa_don, ma_mon, ten_mon, sl_ban, don_gia, doanh_thu) " + root % ist_val
+        engine.execute(query_stmnt)
+    else:
+        line_5 = "There's no any new records needed to be fetched"
+        print(line_5)
+        list_to_log.append(line_5)
+else:
+    line_5 = f"The current term {current_term} is not available"
+    print(line_5)
+    list_to_log.append(line_5)
+end = time.time()
+line_6 = f'Whole process takes {end - start}'
+print(line_6)
+list_to_log.append(line_6)
+
+with open(f'log/order_{now}.txt', 'w') as f:
+    for line in list_to_log:
+        f.write(line)
+        f.write('\n')

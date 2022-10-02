@@ -21,18 +21,25 @@ def get_data_source_by_type(type):
     return temp_arr
 
 def get_finance_data_term_list():  
-    result = engine.execute("SELECT distinct ky FROM order ORDER BY ky")
+    result = engine.execute("SELECT distinct ky FROM finance ORDER BY ky")
     result = result.fetchall()
     term_list = []
     for i in range(len(result)):
-        term = 'THU CHI T' + str(result[i][0])
+        term = 'THU CHI ' + str(result[i][0])
         term_list.append(term)
     return term_list
 
 def get_current_term_finance_db():
     today = str(date.today())
-    current_term = 'THU CHI T' + today[6:7] + '-' + today[2:4]
+    current_term = today[5:7] + '-' + today[2:4]
     result = engine.execute("SELECT ngay_number, ngay, doanh_thu FROM finance where ky = '%s'" % (current_term))
+    df = pd.DataFrame(result.fetchall())
+    return df
+
+def get_current_term_order_db():
+    today = str(date.today())
+    current_term = today[5:7] + '-' + today[2:4]
+    result = engine.execute("SELECT ngay_number, so_hoa_don FROM orders where ky = '%s'" % (current_term))
     df = pd.DataFrame(result.fetchall())
     return df
 
@@ -41,7 +48,7 @@ def get_order_data_term_list():
     result = result.fetchall()
     term_list = []
     for i in range(len(result)):
-        term = 'ORDER T' + str(result[i][0])
+        term = 'ORDER ' + str(result[i][0])
         term_list.append(term)
     return term_list
 
@@ -74,9 +81,9 @@ def create_df_finance(file_name):
     days = []
     for i in range(data["days_in_month"][month]):
         days.append(str(i + 1))
-    add_term =  month + '-' + year[-2:]
     if len(month) == 1:
         month = '0' + month
+    add_term =  month + '-' + year[-2:]
     date = []
     term = []
     date_number = []
@@ -206,7 +213,5 @@ def export_list_df_by_type(cycle, type, function):
     return df
 
 if __name__ == "__main__":
-    # res = get_finance_data_term_list()
-    res = get_current_term_finance_db()
-    print(res.dtypes)
-    print(res)
+    res = create_df_order('ORDER 04-22')
+    print(res['df'].head())

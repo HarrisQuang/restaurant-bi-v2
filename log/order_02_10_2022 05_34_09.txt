@@ -1,0 +1,6 @@
+Datetime: 02_10_2022 05_34_09
+--> File list from data source: ['ORDER 04-22', 'ORDER 10-22']
+Existing term list from DB: ['ORDER 04-22', 'ORDER 10-22']
+No new files need to be migrated
+List of days need to be appended: [20221004, 20221005]
+Whole process takes 8.451385498046875

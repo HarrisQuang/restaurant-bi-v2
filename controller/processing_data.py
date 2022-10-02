@@ -100,10 +100,11 @@ def processing_df_order(final_df):
     final_df.dropna(subset = ['Mã món'], axis = 0, inplace=True)
     final_df['Ngày'].replace('', np.nan, inplace=True)
     final_df.dropna(subset = ['Ngày'], axis = 0, inplace=True)
-    final_df['SL bán'] = final_df['SL bán'].astype(float, copy=True)
+    final_df['SL bán'] = final_df['SL bán'].astype(int, copy=True)
     final_df[['Đơn giá', 'Doanh thu']] = final_df[['Đơn giá', 'Doanh thu']].astype(float, copy=True)
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
     final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '-' + str(x.year)[2:])
+    final_df['Cycle'] = final_df['Cycle'].apply(lambda x: '0'+ x if len(x) == 4 else x)
     final_df['ngay_number'] = final_df['Ngày'].apply(lambda x: x.strftime('%Y%m%d')).astype(int, copy=True)
     final_df = final_df[data['completely_order_df_base_cols']]
     return final_df
@@ -121,10 +122,18 @@ def export_one_df_order(file_name):
     return final_df
     
 def finalize_one_df_finance_by_term(term):
-    term = term[9:]
+    term = term[8:]
     result = engine.execute("SELECT * FROM finance WHERE ky = '%s'" % (term))
     df = pd.DataFrame(result.fetchall())
     df.columns = data['completely_finance_df_base_cols']
+    return df
+
+def finalize_one_df_order_by_term(term):
+    term = term[6:]
+    result = engine.execute("SELECT * FROM orders WHERE ky = '%s'" % (term))
+    df = pd.DataFrame(result.fetchall())
+    df['ngay'] = pd.to_datetime(df['ngay']).dt.date
+    df.columns = data['completely_order_df_base_cols']
     return df
 
 def finalize_list_df_finance_by_cycle(cycle):
@@ -355,7 +364,9 @@ def get_statistic_osed(df):
                                                'Median (SL hóa đơn)', 'Mode (SL hóa đơn)'])
     return final_df
 
-# if __name__ == "__main__":
-#     df = export_one_df_order('ORDER T4-22')
-#     print(df.head(10))
+if __name__ == "__main__":
+    # df = export_one_df_order('ORDER 04-22')
+    df = export_one_df_finance('THU CHI 05-22')
+    print(df.head(10))
+    print(df.dtypes)
     
