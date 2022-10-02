@@ -124,25 +124,30 @@ today = str(date.today())
 current_term = 'ORDER ' + today[5:7] + '-' + today[2:4]
 df = export_one_df_order(current_term)
 if df is not None:
-    ngay_number_from_source_max = int(df['ngay_number'].max())
-
+    so_hd_list_source = df['Số hóa đơn'].unique()
+    
     df1 = get_current_term_order_db()
-    ngay_number_from_db_max = df1['ngay_number'].max()
+    so_hd_list_db = df1['so_hoa_don'].unique()
 
-    ngay_number_list_to_add = []
-    if ngay_number_from_source_max > ngay_number_from_db_max:
-        count = ngay_number_from_source_max - ngay_number_from_db_max
-        for i in range(count):
-            ngay_number_from_db_max = ngay_number_from_db_max + 1
-            ngay_number_list_to_add.append(ngay_number_from_db_max)
+    so_hd_list_to_add = []
         
-        line_5 = f'List of days need to be appended: {ngay_number_list_to_add}'
+    if len(so_hd_list_source) > len(so_hd_list_db):
+        for hd_source in so_hd_list_source:
+            count = 0
+            for hd_db in so_hd_list_db:
+                if hd_source == hd_db:
+                    count += 1
+                    break
+            if count == 0:
+                so_hd_list_to_add.append(hd_source)
+        
+        line_5 = f'List of orders need to be appended: {so_hd_list_to_add}'
         print(line_5)
         list_to_log.append(line_5)
         
         part_df = []
-        for ngay_number in ngay_number_list_to_add:
-            new_df = df[df['ngay_number'] == ngay_number]
+        for so_hd in so_hd_list_to_add:
+            new_df = df[df['Số hóa đơn'] == so_hd]
             part_df.append(new_df)
         final_df = pd.concat(part_df, axis=0)           
             
