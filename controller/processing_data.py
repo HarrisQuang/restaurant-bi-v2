@@ -75,6 +75,7 @@ def resolve_overlap_dish_remove_extra_fee(df):
             sl_ban = 0
             doanh_thu = 0
             cycle = ''
+            flag = 0
             for j in mon:
                 try:
                     don_gia = df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Đơn giá'].values[0]
@@ -82,15 +83,17 @@ def resolve_overlap_dish_remove_extra_fee(df):
                     sl_ban += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['SL bán'].values[0]
                     doanh_thu += df[(df['Mã món'] == j) & (df['Ngày'] == k)]['Doanh thu'].values[0]
                     df.loc[(df['Mã món'] == j) & (df['Ngày'] == k), 'Mã món'] = np.nan
+                    flag += 1
                 except:
-                    pass
-            new_row = pd.DataFrame({'Ngày': k, 'Cycle': cycle, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
-                    'Doanh thu': doanh_thu}, index = [df.shape[0]])
+                    pass   
+            if flag > 0:
+                new_row = pd.DataFrame({'Ngày': k, 'Cycle': cycle, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
+                        'Doanh thu': doanh_thu}, index = [df.shape[0]])
             # new_row = {'Ngày': k, 'Tên món': data['new_dish_name'][i], 'Mã món': '', 'SL bán' : sl_ban, 'Đơn giá': don_gia,
             #         'Doanh thu': doanh_thu}
-            df = pd.concat([new_row, df.loc[:]])
+                df = pd.concat([new_row, df.loc[:]])
             # df = df.append(new_row, ignore_index=True)
-            df.dropna(subset=['Mã món'], axis = 0, inplace = True)
+                df.dropna(subset=['Mã món'], axis = 0, inplace = True)
     # create mask disk name
     # df = create_mask_dish_name(df) 
     return df
@@ -100,7 +103,7 @@ def processing_df_order(final_df):
     final_df.dropna(subset = ['Mã món'], axis = 0, inplace=True)
     final_df['Ngày'].replace('', np.nan, inplace=True)
     final_df.dropna(subset = ['Ngày'], axis = 0, inplace=True)
-    final_df['SL bán'] = final_df['SL bán'].astype(int, copy=True)
+    final_df['SL bán'] = final_df['SL bán'].astype(float, copy=True)
     final_df[['Đơn giá', 'Doanh thu']] = final_df[['Đơn giá', 'Doanh thu']].astype(float, copy=True)
     final_df['Ngày'] = pd.to_datetime(final_df['Ngày']).dt.date
     final_df['Cycle'] = final_df['Ngày'].apply(lambda x: str(x.month) + '-' + str(x.year)[2:])

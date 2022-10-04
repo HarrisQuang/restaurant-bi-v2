@@ -28,6 +28,8 @@ list_to_log.append(f'Datetime: {now}')
 print('Start getting files from data source')
 engine = create_engine("postgresql://postgres:12345678@localhost:5432/demo_db")
 
+engine.execute("CREATE TABLE IF NOT EXISTS orders (ngay_number integer, ky text, ngay text, so_hoa_don text, ma_mon text, ten_mon text, sl_ban real, don_gia real, doanh_thu real)")
+
 SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = 'even-impulse-302623-7a2843af23d8.json'
 credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)

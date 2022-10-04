@@ -1,0 +1,6 @@
+Datetime: 05_10_2022 05_54_34
+--> File list from data source: ['ORDER 04-22', 'ORDER 10-22']
+There's no data in DB
+--> Files need to be migrated: ['ORDER 04-22', 'ORDER 10-22']
+There's no any new records needed to be fetched
+Whole process takes 16.118767499923706
