@@ -146,8 +146,26 @@ def finalize_list_df_order_by_cycle(cycle):
     df = processing_df_order(df)
     return df
 
+def finalize_list_df_order_by_term(term):
+    if not term:
+        temp = get_order_data_term_list()[-1]
+        term =[temp]
+    part_df = []
+    for el in term:
+        el = el[6:]
+        result = engine.execute("SELECT * FROM orders WHERE ky = '%s'" % (el))
+        df = pd.DataFrame(result.fetchall())
+        df['ngay'] = pd.to_datetime(df['ngay']).dt.date
+        df.columns = data['completely_order_df_base_cols']
+        part_df.append(df)
+    final_df = pd.concat(part_df, axis = 0)
+    return final_df
+        
+
 def finalize_list_df_order_grouping_cycle(df, sltd_list):
+    print(df)
     df = resolve_overlap_dish_remove_extra_fee(df)
+    print(df)
     filter_df = []
     for i in sltd_list:
         if i != '...':

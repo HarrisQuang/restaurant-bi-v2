@@ -160,7 +160,7 @@ with tab2:
         
     with placeholder.container():
         st.markdown("### Tỷ trọng doanh thu")
-        finance_cycle_list = get_cycle_list_by_type('finance')
+        finance_cycle_list = get_finance_data_term_list()
         
         with st.form(key='form-chon-cycle-ty-trong-dthu'):
             col1, col2 = st.columns(2)
@@ -174,78 +174,78 @@ with tab2:
                 options = st.multiselect('Chọn nguồn doanh thu', dthu_type)
             submitted = st.form_submit_button('Thực hiện')
         
-        # st.markdown("### Món ăn")
-        # order_cycle_list = get_cycle_list_by_type('order')
+        st.markdown("### Món ăn")
+        order_term_list = get_order_data_term_list()
         
-        # with st.form(key='form-chon-cycle-mon-an'):
-        #     col1, col2 = st.columns(2)
-        #     with col1:
-        #         cycle = st.multiselect('Chọn kỳ', order_cycle_list)
-        #     submitted = st.form_submit_button('Thực hiện')
+        with st.form(key='form-chon-cycle-mon-an'):
+            col1, col2 = st.columns(2)
+            with col1:
+                term = st.multiselect('Chọn kỳ', order_term_list)
+            submitted = st.form_submit_button('Thực hiện')
             
-        # list_df_order = finalize_list_df_order_by_cycle(cycle)
-        # dish_list_res = dish_list(list_df_order)
-        # sltd_list = []
-        # metric_type_list = ['Total SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
-        #                     'Mode SL bán']
+        list_df_order = finalize_list_df_order_by_term(term)
+        dish_list_res = dish_list(list_df_order)
+        sltd_list = []
+        metric_type_list = ['Total SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
+                            'Mode SL bán']
         
-        # with st.form(key='form-chon-mon-an'):
-        #     cols = st.columns(5)
-        #     for i, col in enumerate(cols):
-        #         sltd = col.selectbox('Chọn món', dish_list_res, key=i+5, index=len(dish_list_res)-1)
-        #         sltd_list.append(sltd)
-        #     col3, col4 = st.columns(2)
-        #     with col3:
-        #         metric_type = st.selectbox("Loại thống kê", metric_type_list, index = 3)
-        #     submitted = st.form_submit_button('Thực hiện')
+        with st.form(key='form-chon-mon-an'):
+            cols = st.columns(5)
+            for i, col in enumerate(cols):
+                sltd = col.selectbox('Chọn món', dish_list_res, key=i+5, index=len(dish_list_res)-1)
+                sltd_list.append(sltd)
+            col3, col4 = st.columns(2)
+            with col3:
+                metric_type = st.selectbox("Loại thống kê", metric_type_list, index = 3)
+            submitted = st.form_submit_button('Thực hiện')
         
-        # list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
+        list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
         
-        # def get_fig4_chart(data, metric_type):
-        #     hover = alt.selection_single(
-        #         fields=["Cycle"],
-        #         nearest=True,
-        #         on="mouseover",
-        #         empty="none",
-        #     )
-        #     lines = alt.Chart(data).mark_line().encode(
-        #                 x = 'Cycle:O',
-        #                 y = metric_type + ':Q',
-        #                 color = 'Tên món:N',
-        #                 strokeDash='Tên món:N')
-        #     points = lines.transform_filter(hover).mark_circle(size=65)
-        #     tooltips = (
-        #         alt.Chart(data)
-        #         .mark_rule()
-        #         .encode(
-        #             x="Cycle",
-        #             y=metric_type,
-        #             opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
-        #             tooltip=[
-        #                 alt.Tooltip(metric_type, title="Value"),
-        #                 alt.Tooltip('Cycle', title="Cycle"),
-        #                 alt.Tooltip('Tên món', title="Tên món")
-        #             ],
-        #         )
-        #         .add_selection(hover)
-        #     )
-        #     return (lines + points + tooltips).interactive()
+        def get_fig4_chart(data, metric_type):
+            hover = alt.selection_single(
+                fields=["Cycle"],
+                nearest=True,
+                on="mouseover",
+                empty="none",
+            )
+            lines = alt.Chart(data).mark_line().encode(
+                        x = 'Cycle:O',
+                        y = metric_type + ':Q',
+                        color = 'Tên món:N',
+                        strokeDash='Tên món:N')
+            points = lines.transform_filter(hover).mark_circle(size=65)
+            tooltips = (
+                alt.Chart(data)
+                .mark_rule()
+                .encode(
+                    x="Cycle",
+                    y=metric_type,
+                    opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
+                    tooltip=[
+                        alt.Tooltip(metric_type, title="Value"),
+                        alt.Tooltip('Cycle', title="Cycle"),
+                        alt.Tooltip('Tên món', title="Tên món")
+                    ],
+                )
+                .add_selection(hover)
+            )
+            return (lines + points + tooltips).interactive()
         
-        # if not cycle or len(cycle) == 1:
-        #     list_df_order_grouping_cycle = sort_df(list_df_order_grouping_cycle, 'Tổng SL bán')
-        #     st.table(list_df_order_grouping_cycle.style.format({'Tổng SL bán': '{:,.0f}', 'Max SL bán': '{:,.0f}', 'Min SL bán': '{:,.0f}',
-        #                                     'Avg SL bán': '{:,.2f}', 'Median SL bán': '{:,.0f}', 'Mode SL bán': '{:,.0f}'}))
-        # else:
-        #     if metric_type == 'Total SL bán':
-        #         fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
-        #     if metric_type == 'Max SL bán':
-        #         fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Max SL bán')
-        #     if metric_type == 'Min SL bán':
-        #         fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Min SL bán')
-        #     if metric_type == 'Avg SL bán':
-        #         fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Avg SL bán')
-        #     if metric_type == 'Median SL bán':
-        #         fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Median SL bán')
-        #     if metric_type == 'Mode SL bán':
-        #         fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Mode SL bán')
-        #     st.altair_chart(fig_4, use_container_width=True)
+        if not cycle or len(cycle) == 1:
+            list_df_order_grouping_cycle = sort_df(list_df_order_grouping_cycle, 'Tổng SL bán')
+            st.table(list_df_order_grouping_cycle.style.format({'Tổng SL bán': '{:,.0f}', 'Max SL bán': '{:,.0f}', 'Min SL bán': '{:,.0f}',
+                                            'Avg SL bán': '{:,.2f}', 'Median SL bán': '{:,.0f}', 'Mode SL bán': '{:,.0f}'}))
+        else:
+            if metric_type == 'Total SL bán':
+                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
+            if metric_type == 'Max SL bán':
+                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Max SL bán')
+            if metric_type == 'Min SL bán':
+                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Min SL bán')
+            if metric_type == 'Avg SL bán':
+                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Avg SL bán')
+            if metric_type == 'Median SL bán':
+                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Median SL bán')
+            if metric_type == 'Mode SL bán':
+                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Mode SL bán')
+            st.altair_chart(fig_4, use_container_width=True)
