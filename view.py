@@ -160,12 +160,12 @@ with tab2:
         
     with placeholder.container():
         st.markdown("### Tỷ trọng doanh thu")
-        finance_cycle_list = get_finance_data_term_list()
+        finance_term_list = get_finance_data_term_list()
         
         with st.form(key='form-chon-cycle-ty-trong-dthu'):
             col1, col2 = st.columns(2)
             with col1:
-                cycle = st.multiselect('Chọn kỳ', finance_cycle_list)
+                term = st.multiselect('Chọn kỳ', finance_term_list)
             submitted = st.form_submit_button('Thực hiện')
         
         with st.form(key='form-chon-nguon-ty-trong-dthu'):
@@ -231,7 +231,7 @@ with tab2:
             )
             return (lines + points + tooltips).interactive()
         
-        if not cycle or len(cycle) == 1:
+        if not term or len(term) == 1:
             list_df_order_grouping_cycle = sort_df(list_df_order_grouping_cycle, 'Tổng SL bán')
             st.table(list_df_order_grouping_cycle.style.format({'Tổng SL bán': '{:,.0f}', 'Max SL bán': '{:,.0f}', 'Min SL bán': '{:,.0f}',
                                             'Avg SL bán': '{:,.2f}', 'Median SL bán': '{:,.0f}', 'Mode SL bán': '{:,.0f}'}))
