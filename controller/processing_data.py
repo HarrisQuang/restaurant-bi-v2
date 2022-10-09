@@ -329,7 +329,8 @@ def dish_sale_every_day(df, sltd_list):
         # final_df = df[(df['Tên món'] == msk_dish_name['Cơm trộn']) | (df['Tên món'] == msk_dish_name['Gỏi Cuốn Nấm']) |
         #               (df['Tên món'] == msk_dish_name['Bún Chả Giò Nấm']) | (df['Tên món'] == msk_dish_name['Bún Thái'])]
     final_df.loc[:,'Ngày'] = final_df['Ngày'].apply(lambda x: x.strftime('%d/%m/%Y'))
-    return final_df
+    count_ngay = final_df['Ngày'].nunique()
+    return (count_ngay, final_df)
 
 def create_df_stt_dsed(df, sltd_list):
     df = resolve_overlap_dish_remove_extra_fee(df)
@@ -340,13 +341,13 @@ def create_df_stt_dsed(df, sltd_list):
             vals, counts = np.unique(new_df['SL bán'], return_counts=True)
             mode_value_index = np.argwhere(counts == np.max(counts))
             mode_value = vals[mode_value_index][0][0]
-            row = [sltd_list[i], round(np.max(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
+            row = [np.min(df['Ngày']), np.max(df['Ngày']), sltd_list[i], round(np.max(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
                         round(np.min(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2), 
                         round(np.mean(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
                         round(np.median(df[df['Tên món'] == sltd_list[i]]['SL bán']), 2),
                         round(mode_value, 2)]
             temp_arr.append(row)
-    temp_df = pd.DataFrame(temp_arr, columns=['Món', 'Max (SL bán)', 'Min (SL bán)', "Avg (SL bán)",
+    temp_df = pd.DataFrame(temp_arr, columns=['Ngày bắt đầu', 'Ngày kết thúc', 'Món', 'Max (SL bán)', 'Min (SL bán)', "Avg (SL bán)",
                                               'Median (SL bán)', 'Mode (SL bán)'])
     return temp_df
 

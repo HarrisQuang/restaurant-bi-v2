@@ -139,13 +139,14 @@ with tab1:
                 sltd_list.append(sltd)
             submitted = st.form_submit_button('Thực hiện')
         dish_sale_every_day = dish_sale_every_day(df_order, sltd_list)
-
-        fig_3 = alt.Chart(dish_sale_every_day).mark_line().encode(
-        x = 'Ngày:O',
-        y = 'SL bán:Q',
-        color = 'Tên món:N',
-        strokeDash='Tên món:N')
-        st.altair_chart(fig_3, use_container_width=True)
+        
+        if dish_sale_every_day[0] != 1:
+            fig_3 = alt.Chart(dish_sale_every_day[1]).mark_line().encode(
+            x = 'Ngày:O',
+            y = 'SL bán:Q',
+            color = 'Tên món:N',
+            strokeDash='Tên món:N')
+            st.altair_chart(fig_3, use_container_width=True)
         
         get_statistic_dsed = get_statistic_dsed(df_order, sltd_list)
         st.table(get_statistic_dsed.style.format({'Max (SL bán)': '{:,.0f}', 'Min (SL bán)': '{:,.0f}',
