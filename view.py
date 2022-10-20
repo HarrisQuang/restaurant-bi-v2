@@ -237,6 +237,7 @@ with tab2:
             st.table(list_df_order_grouping_cycle.style.format({'Tổng SL bán': '{:,.0f}', 'Max SL bán': '{:,.0f}', 'Min SL bán': '{:,.0f}',
                                             'Avg SL bán': '{:,.2f}', 'Median SL bán': '{:,.0f}', 'Mode SL bán': '{:,.0f}'}))
         else:
+            print(list_df_order_grouping_cycle.head(20))
             if metric_type == 'Total SL bán':
                 fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
             if metric_type == 'Max SL bán':

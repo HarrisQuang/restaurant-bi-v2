@@ -166,9 +166,7 @@ def finalize_list_df_order_by_term(term):
         
 
 def finalize_list_df_order_grouping_cycle(df, sltd_list):
-    print(df)
     df = resolve_overlap_dish_remove_extra_fee(df)
-    print(df)
     filter_df = []
     for i in sltd_list:
         if i != '...':
@@ -192,7 +190,7 @@ def finalize_list_df_order_grouping_cycle(df, sltd_list):
             vals, counts = np.unique(temp_df['SL bán'], return_counts=True)
             mode_value_index = np.argwhere(counts == np.max(counts))
             mode_sl_ban = vals[mode_value_index][0][0]
-            temp_df = pd.DataFrame({'Kỳ': c, 'Tên món': m, 'Tổng SL bán': sum_sl_ban, 'Max SL bán': max_sl_ban,
+            temp_df = pd.DataFrame({'Cycle': c, 'Tên món': m, 'Tổng SL bán': sum_sl_ban, 'Max SL bán': max_sl_ban,
                                  'Min SL bán': min_sl_ban, 'Avg SL bán': avg_sl_ban, 'Median SL bán': median_sl_ban,
                                  'Mode SL bán': mode_sl_ban}, index=[count])
             part_df.append(temp_df)
