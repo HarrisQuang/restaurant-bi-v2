@@ -5,3 +5,6 @@ oauth.txt
 # controller/download_*.py
 client_secret_137661970256-ntr6olt18t5iq59c7i9pgjv9i86qskc8.apps.googleusercontent.com.json
 *.xls
+log
+*.xlsx
+temp

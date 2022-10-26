@@ -187,7 +187,7 @@ with tab2:
         list_df_order = finalize_list_df_order_by_term(term)
         dish_list_res = dish_list(list_df_order)
         sltd_list = []
-        metric_type_list = ['Total SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
+        metric_type_list = ['...', 'Tổng SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
                             'Mode SL bán']
         
         with st.form(key='form-chon-mon-an'):
@@ -197,9 +197,12 @@ with tab2:
                 sltd_list.append(sltd)
             col3, col4 = st.columns(2)
             with col3:
-                metric_type = st.selectbox("Loại thống kê", metric_type_list, index = 3)
+                metric_type = st.selectbox("Loại thống kê", metric_type_list)
             submitted = st.form_submit_button('Thực hiện')
         
+        if metric_type == '...':
+            metric_type = 'Tổng SL bán'
+
         list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
         
         def get_fig4_chart(data, metric_type):
@@ -233,21 +236,23 @@ with tab2:
             return (lines + points + tooltips).interactive()
         
         if not term or len(term) == 1:
-            list_df_order_grouping_cycle = sort_df(list_df_order_grouping_cycle, 'Tổng SL bán')
-            st.table(list_df_order_grouping_cycle.style.format({'Tổng SL bán': '{:,.0f}', 'Max SL bán': '{:,.0f}', 'Min SL bán': '{:,.0f}',
-                                            'Avg SL bán': '{:,.2f}', 'Median SL bán': '{:,.0f}', 'Mode SL bán': '{:,.0f}'}))
+            list_df_order_grouping_cycle = sort_df(list_df_order_grouping_cycle, metric_type)
+            list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
+            st.table(list_df_order_grouping_cycle.style.format({metric_type: '{:,.0f}'}))
         else:
-            print(list_df_order_grouping_cycle.head(20))
-            if metric_type == 'Total SL bán':
-                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
-            if metric_type == 'Max SL bán':
-                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Max SL bán')
-            if metric_type == 'Min SL bán':
-                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Min SL bán')
-            if metric_type == 'Avg SL bán':
-                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Avg SL bán')
-            if metric_type == 'Median SL bán':
-                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Median SL bán')
-            if metric_type == 'Mode SL bán':
-                fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Mode SL bán')
+            list_df_order_grouping_cycle = calculate_delta_measure_dish_by_cycle(list_df_order_grouping_cycle)
+            print(list_df_order_grouping_cycle[['Min SL bán', '% Min SL bán']].head(20))
+            # if metric_type == 'Total SL bán':
+            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
+            # if metric_type == 'Max SL bán':
+            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Max SL bán')
+            # if metric_type == 'Min SL bán':
+            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Min SL bán')
+            # if metric_type == 'Avg SL bán':
+            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Avg SL bán')
+            # if metric_type == 'Median SL bán':
+            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Median SL bán')
+            # if metric_type == 'Mode SL bán':
+            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Mode SL bán')
+            fig_4 = get_fig4_chart(list_df_order_grouping_cycle, metric_type)
             st.altair_chart(fig_4, use_container_width=True)

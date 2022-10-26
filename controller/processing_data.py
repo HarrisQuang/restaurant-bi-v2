@@ -175,8 +175,9 @@ def finalize_list_df_order_grouping_cycle(df, sltd_list):
     if filter_df:
         final_df = pd.concat(filter_df, axis=0)
     else:
-        final_df = df[(df['Tên món'] == 'Cơm trộn') | (df['Tên món'] == 'Gỏi Cuốn Nấm') |
-                      (df['Tên món'] == 'Bún Chả Giò Nấm') | (df['Tên món'] == 'Bún Thái')]
+        # final_df = df[(df['Tên món'] == 'Cơm trộn') | (df['Tên món'] == 'Gỏi Cuốn Nấm') |
+        #               (df['Tên món'] == 'Bún Chả Giò Nấm') | (df['Tên món'] == 'Bún Thái')]
+        final_df = df[df['Tên món'] == 'Bún Thái']
     part_df = []
     count = 0
     for c in final_df['Cycle'].unique():
@@ -198,6 +199,27 @@ def finalize_list_df_order_grouping_cycle(df, sltd_list):
     final_df = pd.concat(part_df, axis=0)
     return final_df
 
+def calculate_delta_measure_dish_by_cycle(df):
+    df['Cycle_number'] = df['Cycle'].apply(lambda x: int(x[3:] + x[0:2]))
+    df = df.sort_values(by = ['Tên món', 'Cycle_number'], ascending = True).reset_index(drop = True)
+    measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+    for el in measure_delta.keys():
+        temp = []
+        for i, el1 in enumerate(df[el]):
+            if i == 0:
+                temp.append('0%')
+            else:
+                delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
+                if delta > 0:
+                    delta = '🔼 ' + str(delta) + '%'
+                    temp.append(delta)
+                else:
+                    delta = '🔻 ' + str(delta) + '%'
+                    temp.append(delta)
+        df[measure_delta[el]] = temp
+    return df
+    
 def revenue_cost_overal(df):
     df = df[['BAEMIN', 'GRAB', 'SP-FOOD', 'TAI-QUAN', 'CHI-PHI', 'CK-SP-FOOD', 'CK-GRAB', 'CK-BAEMIN', 'NGAY']]
     df = df.melt(id_vars=['NGAY'], var_name=['Sub-cate'], value_name='giatri')
