@@ -204,10 +204,20 @@ def calculate_delta_measure_dish_by_cycle(df):
     df = df.sort_values(by = ['Tên món', 'Cycle_number'], ascending = True).reset_index(drop = True)
     measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
                      'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+    temp = []
+    for i, val in enumerate(df['Tên món']):
+        if i == 0:
+            temp.append(0)
+        else:
+            if df['Tên món'][i] != df['Tên món'][i-1]:
+                temp.append(0)
+            else:
+                temp.append(1)
+    df['flag'] = temp
     for el in measure_delta.keys():
         temp = []
         for i, el1 in enumerate(df[el]):
-            if i == 0:
+            if df['flag'][i] == 0:
                 temp.append('0%')
             else:
                 delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)

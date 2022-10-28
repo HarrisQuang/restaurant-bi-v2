@@ -218,6 +218,8 @@ with tab2:
                         color = 'Tên món:N',
                         strokeDash='Tên món:N')
             points = lines.transform_filter(hover).mark_circle(size=65)
+            measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
             tooltips = (
                 alt.Chart(data)
                 .mark_rule()
@@ -228,7 +230,8 @@ with tab2:
                     tooltip=[
                         alt.Tooltip(metric_type, title="Value"),
                         alt.Tooltip('Cycle', title="Cycle"),
-                        alt.Tooltip('Tên món', title="Tên món")
+                        alt.Tooltip('Tên món', title="Tên món"),
+                        alt.Tooltip(measure_delta[metric_type], title="Thay đổi")
                     ],
                 )
                 .add_selection(hover)
