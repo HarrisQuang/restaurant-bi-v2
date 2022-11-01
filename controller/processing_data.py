@@ -94,6 +94,7 @@ def resolve_overlap_dish_remove_extra_fee(df):
                 df = pd.concat([new_row, df.loc[:]])
             # df = df.append(new_row, ignore_index=True)
                 df.dropna(subset=['Mã món'], axis = 0, inplace = True)
+    df['ngay_number'] = df['Ngày'].apply(lambda x: int(x.strftime('%Y%m%d')))
     # create mask disk name
     # df = create_mask_dish_name(df) 
     return df
@@ -164,6 +165,59 @@ def finalize_list_df_order_by_term(term):
     final_df = pd.concat(part_df, axis = 0)
     return final_df
         
+def statistic_dish_by_cycle(df):
+    part_df = []
+    count = 0
+    for c in df['Cycle'].unique():
+        for m in df['Tên món'].unique():
+            temp_df = df[(df['Cycle'] == c) & (df['Tên món'] == m)]
+            if not temp_df.empty:
+                sum_sl_ban = np.sum(temp_df['SL bán'])
+                max_sl_ban = np.max(temp_df['SL bán'])
+                min_sl_ban = np.min(temp_df['SL bán'])
+                avg_sl_ban = round(np.mean(temp_df['SL bán']),2)
+                median_sl_ban = np.median(temp_df['SL bán'])
+                vals, counts = np.unique(temp_df['SL bán'], return_counts=True)
+                mode_value_index = np.argwhere(counts == np.max(counts))
+                mode_sl_ban = vals[mode_value_index][0][0]
+                temp_df = pd.DataFrame({'Cycle': c, 'Tên món': m, 'Tổng SL bán': sum_sl_ban, 'Max SL bán': max_sl_ban,
+                                    'Min SL bán': min_sl_ban, 'Avg SL bán': avg_sl_ban, 'Median SL bán': median_sl_ban,
+                                    'Mode SL bán': mode_sl_ban}, index=[count])
+                part_df.append(temp_df)
+                count += 1
+    df = pd.concat(part_df, axis=0)
+    df['Cycle_number'] = df['Cycle'].apply(lambda x: int(x[3:] + x[0:2]))
+    df = df.sort_values(by = ['Tên món', 'Cycle_number'], ascending = True).reset_index(drop = True)
+    measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+    temp = []
+    for i, val in enumerate(df['Tên món']):
+        if i == 0:
+            temp.append(0)
+        else:
+            if df['Tên món'][i] != df['Tên món'][i-1]:
+                temp.append(0)
+            else:
+                temp.append(1)
+    df['flag'] = temp
+    for el in measure_delta.keys():
+        temp = []
+        for i, el1 in enumerate(df[el]):
+            if df['flag'][i] == 0:
+                temp.append('0%')
+            else:
+                delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
+                if delta > 0:
+                    delta = '🔼 ' + str(delta) + '%'
+                    temp.append(delta)
+                elif delta == 0:
+                    delta = '🔷 ' + str(delta) + '%'
+                    temp.append(delta)
+                else:
+                    delta = '🔻 ' + str(delta) + '%'
+                    temp.append(delta)
+        df[measure_delta[el]] = temp
+    return df
 
 def finalize_list_df_order_grouping_cycle(df, sltd_list):
     df = resolve_overlap_dish_remove_extra_fee(df)

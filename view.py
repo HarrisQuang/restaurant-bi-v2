@@ -177,20 +177,15 @@ with tab2:
         
         st.markdown("### Món ăn")
         order_term_list = get_order_data_term_list()
+        dish_list = get_order_data_dish_list()
+        sltd_list = []
+        metric_type_list = ['...', 'Tổng SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
+                            'Mode SL bán']
         
         with st.form(key='form-chon-cycle-mon-an'):
             col1, col2 = st.columns(2)
             with col1:
                 term = st.multiselect('Chọn kỳ', order_term_list)
-            submitted = st.form_submit_button('Thực hiện')
-            
-        list_df_order = finalize_list_df_order_by_term(term)
-        dish_list_res = dish_list(list_df_order)
-        sltd_list = []
-        metric_type_list = ['...', 'Tổng SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
-                            'Mode SL bán']
-        
-        with st.form(key='form-chon-mon-an'):
             cols = st.columns(5)
             for i, col in enumerate(cols):
                 sltd = col.selectbox('Chọn món', dish_list_res, key=i+5, index=len(dish_list_res)-1)
@@ -200,10 +195,35 @@ with tab2:
                 metric_type = st.selectbox("Loại thống kê", metric_type_list)
             submitted = st.form_submit_button('Thực hiện')
         
+        if not term:
+            term = [get_order_data_term_list()[-1]]
+            
         if metric_type == '...':
             metric_type = 'Tổng SL bán'
+        
+        final_sltd_list = []
+        for i in sltd_list:
+            if i != '...':
+                final_sltd_list.append(i)
+        if len(final_sltd_list) == 0:
+            final_sltd_list.append('Bún Thái')
+            
+        # list_df_order = finalize_list_df_order_by_term(term)
+        # dish_list_res = dish_list(list_df_order)
+        
+        # with st.form(key='form-chon-mon-an'):
+        #     cols = st.columns(5)
+        #     for i, col in enumerate(cols):
+        #         sltd = col.selectbox('Chọn món', dish_list_res, key=i+5, index=len(dish_list_res)-1)
+        #         sltd_list.append(sltd)
+        #     col3, col4 = st.columns(2)
+        #     with col3:
+        #         metric_type = st.selectbox("Loại thống kê", metric_type_list)
+        #     submitted = st.form_submit_button('Thực hiện')
 
         list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
+        
+        
         
         def get_fig4_chart(data, metric_type):
             hover = alt.selection_single(

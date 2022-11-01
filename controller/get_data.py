@@ -44,13 +44,38 @@ def get_current_term_order_db():
     return df
 
 def get_order_data_term_list():  
-    result = engine.execute("SELECT distinct ky FROM orders ORDER BY ky")
+    result = engine.execute("SELECT distinct cycle FROM resolve_overlap_dish_remove_extra_fee ORDER BY cycle")
     result = result.fetchall()
     term_list = []
     for i in range(len(result)):
         term = 'ORDER ' + str(result[i][0])
         term_list.append(term)
     return term_list
+
+def get_order_data_dish_list():  
+    result = engine.execute("SELECT distinct ten_mon FROM resolve_overlap_dish_remove_extra_fee ORDER BY ten_mon")
+    result = result.fetchall()
+    ten_mon_list = []
+    for i in range(len(result)):
+        ten_mon = str(result[i][0])
+        ten_mon_list.append(ten_mon)
+    ten_mon_list.append('...')
+    return ten_mon_list
+
+def get_order_data_from_db():
+    result = engine.execute("SELECT * FROM orders")
+    df = pd.DataFrame(result.fetchall())
+    df['ngay'] = pd.to_datetime(df['ngay']).dt.date
+    df.columns = data['completely_order_df_base_cols']
+    return df
+
+def get_resolve_overlap_remove_extra_data_from_db():
+    result = engine.execute("SELECT * FROM resolve_overlap_dish_remove_extra_fee")
+    df = pd.DataFrame(result.fetchall())
+    df['ngay'] = pd.to_datetime(df['ngay']).dt.date
+    df.columns = data['completely_resolve_overlap_remove_extra_df_base_cols']
+    return df
+
 
 def get_cycle_list_by_type(type):
     res = get_data_source_by_type(type)
