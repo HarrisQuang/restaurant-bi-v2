@@ -23,6 +23,7 @@ print('Start processing data in DB')
 
 # order_data = get_order_data_from_db()
 # tuning_order_data = resolve_overlap_dish_remove_extra_fee(order_data)
+# tuning_order_data = tuning_order_data.iloc[:2]
 
 # Transfrom data in staging
 # -> Export 2 DFs (1 df for finance, 1 df for order) with columns as per requirement
@@ -53,8 +54,30 @@ print('Start processing data in DB')
 resolve_overlap_remove_extra_data = get_resolve_overlap_remove_extra_data_from_db()
 statistic_dish = statistic_dish_by_cycle(resolve_overlap_remove_extra_data)
 print(statistic_dish.head())
-print(statistic_dish.info())
+print(statistic_dish.columns)
 
+# engine.execute("CREATE TABLE IF NOT EXISTS statistic_dish_by_cycle (cycle text, ten_mon text, tong_sl_ban real, max_sl_ban real, min_sl_ban real, avg_sl_ban real, median_sl_ban real, mode_sl_ban real, cycle_number integer, flag integer, pct_tong_sl_ban text, pct_max_sl_ban text, pct_min_sl_ban text, pct_avg_sl_ban text, pct_median_sl_ban text, pct_mode_sl_ban text)")
+
+# root = "VALUES "
+# loop = "('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"
+# for i in range(statistic_dish.shape[0]):
+#     if i == 0:
+#         root = root + loop
+#     else:
+#         root = root + ", " + loop
+
+# ist_val = []
+# for id, row in statistic_dish.iterrows():
+#     for i, val in enumerate(row):
+#         try:
+#             ist_val.append((val.strip()))
+#         except:
+#             ist_val.append(val)
+        
+# ist_val = tuple(ist_val)
+
+# query_stmnt = "INSERT INTO statistic_dish_by_cycle (cycle, ten_mon, tong_sl_ban, max_sl_ban, min_sl_ban, avg_sl_ban, median_sl_ban, mode_sl_ban, cycle_number, flag, pct_tong_sl_ban, pct_max_sl_ban, pct_min_sl_ban, pct_avg_sl_ban, pct_median_sl_ban, pct_mode_sl_ban) " + root % ist_val
+# engine.execute(query_stmnt)
 
 end = time.time()
 line_6 = f'Whole process takes {end - start}'

@@ -221,8 +221,8 @@ with tab2:
         #         metric_type = st.selectbox("Loại thống kê", metric_type_list)
         #     submitted = st.form_submit_button('Thực hiện')
 
-        list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
-        
+        # list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
+        list_df_order_grouping_cycle = get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
         
         
         def get_fig4_chart(data, metric_type):

@@ -46,6 +46,7 @@
     "order_df_base_cols": ["Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
     "completely_order_df_base_cols": ["ngay_number", "Cycle", "Ngày", "Số hóa đơn", "Mã món", "Tên món", "SL bán", "Đơn giá", "Doanh thu"],
     "completely_resolve_overlap_remove_extra_df_base_cols": ["Ngày", "Cycle", "Mã món", "Tên món", "SL bán", "Doanh thu", "Đơn giá", "ngay_number"],
+    "completely_statistic_dish_by_cycle_df_base_cols": ["Cycle", "Tên món", "Tổng SL bán", "Max SL bán", "Min SL bán", "Avg SL bán", "Median SL bán", "Mode SL bán", "Cycle_number", "flag", "% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"],
     "various_dish_name": {"Gỏi 'Rau Củ Nâm' Đặt Biệt": "Gỏi 'Rau Củ Nấm' Đặt Biệt"} ,
     "overlap_dish_code": [["CSNC", "comsuonnuong", "COSUNUCH"], ["COTRSOTUOT", "R013"], ["HTX", "Hutieuxaoden"], ["LNL", "LNN"], ["LTL", "LTN", "LCN"], ["TD", "1", "233"]],
     "mask_dish_name": {"Lẩu thái": "Lẩu tứ xuyên", "Lẩu nấm": "Lẩu tiềm ngũ sắc", "Hủ tiếu xào đen": "Hủ tiếu tương đen", "Cơm trộn": "Cơm ngũ vị",

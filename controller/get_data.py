@@ -76,6 +76,24 @@ def get_resolve_overlap_remove_extra_data_from_db():
     df.columns = data['completely_resolve_overlap_remove_extra_df_base_cols']
     return df
 
+def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
+    refactor_term = []
+    for el in term:
+        refactor_term.append(el[6:])
+    refactor_term = tuple(refactor_term)
+    final_sltd_list = tuple(final_sltd_list)
+    if len(refactor_term) == 1 and len(final_sltd_list) == 1:
+        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon = '%s'" % (refactor_term[0], final_sltd_list[0]))
+    if len(refactor_term) == 1 and len(final_sltd_list) > 1:
+        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon in %s" % (refactor_term[0], final_sltd_list))
+    if len(refactor_term) > 1 and len(final_sltd_list) == 1:
+        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon = '%s'" % (refactor_term, final_sltd_list[0]))
+    if len(refactor_term) > 1 and len(final_sltd_list) > 1:
+        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon in %s" % (refactor_term, final_sltd_list))
+    df = pd.DataFrame(result.fetchall())
+    df.columns = data['completely_statistic_dish_by_cycle_df_base_cols']
+    print(df.head)
+    return df
 
 def get_cycle_list_by_type(type):
     res = get_data_source_by_type(type)

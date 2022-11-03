@@ -204,18 +204,20 @@ def statistic_dish_by_cycle(df):
         temp = []
         for i, el1 in enumerate(df[el]):
             if df['flag'][i] == 0:
-                temp.append('0%')
+                # temp.append('0%')
+                temp.append('0')
             else:
                 delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
-                if delta > 0:
-                    delta = '🔼 ' + str(delta) + '%'
-                    temp.append(delta)
-                elif delta == 0:
-                    delta = '🔷 ' + str(delta) + '%'
-                    temp.append(delta)
-                else:
-                    delta = '🔻 ' + str(delta) + '%'
-                    temp.append(delta)
+                # if delta > 0:
+                #     delta = '🔼 ' + str(delta) + '%'
+                #     temp.append(delta)
+                # elif delta == 0:
+                #     delta = '🔷 ' + str(delta) + '%'
+                #     temp.append(delta)
+                # else:
+                #     delta = '🔻 ' + str(delta) + '%'
+                #     temp.append(delta)
+                temp.append(delta)
         df[measure_delta[el]] = temp
     return df
 
