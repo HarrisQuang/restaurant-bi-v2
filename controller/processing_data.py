@@ -221,6 +221,23 @@ def statistic_dish_by_cycle(df):
         df[measure_delta[el]] = temp
     return df
 
+def markup_statistic_dish_by_cycle(df):
+    markup_cols = data['completely_statistic_dish_by_cycle_df_base_cols'][10:]
+    for el in markup_cols:
+        temp = []
+        for val in df[el].values:
+            if float(val) > 0:
+                val = '🔼 ' + val + '%'
+                temp.append(val)
+            elif float(val) == 0:
+                val = '🔷 ' + val + '%'
+                temp.append(val)
+            else:
+                val = '🔻 ' + val + '%'
+                temp.append(val)
+        df[el] = temp
+    return df
+
 def finalize_list_df_order_grouping_cycle(df, sltd_list):
     df = resolve_overlap_dish_remove_extra_fee(df)
     filter_df = []

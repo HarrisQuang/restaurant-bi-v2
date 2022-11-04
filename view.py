@@ -223,7 +223,7 @@ with tab2:
 
         # list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
         list_df_order_grouping_cycle = get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
-        
+        list_df_order_grouping_cycle = markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
         
         def get_fig4_chart(data, metric_type):
             hover = alt.selection_single(
@@ -263,8 +263,9 @@ with tab2:
             list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
             st.table(list_df_order_grouping_cycle.style.format({metric_type: '{:,.0f}'}))
         else:
-            list_df_order_grouping_cycle = calculate_delta_measure_dish_by_cycle(list_df_order_grouping_cycle)
-            print(list_df_order_grouping_cycle[['Min SL bán', '% Min SL bán']].head(20))
+            # list_df_order_grouping_cycle = calculate_delta_measure_dish_by_cycle(list_df_order_grouping_cycle)
+            # print(list_df_order_grouping_cycle[['Min SL bán', '% Min SL bán']].head(20))
+            
             # if metric_type == 'Total SL bán':
             #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
             # if metric_type == 'Max SL bán':
