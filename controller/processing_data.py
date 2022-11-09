@@ -248,8 +248,6 @@ def finalize_list_df_order_grouping_cycle(df, sltd_list):
     if filter_df:
         final_df = pd.concat(filter_df, axis=0)
     else:
-        # final_df = df[(df['Tên món'] == 'Cơm trộn') | (df['Tên món'] == 'Gỏi Cuốn Nấm') |
-        #               (df['Tên món'] == 'Bún Chả Giò Nấm') | (df['Tên món'] == 'Bún Thái')]
         final_df = df[df['Tên món'] == 'Bún Thái']
     part_df = []
     count = 0

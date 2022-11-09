@@ -208,20 +208,6 @@ with tab2:
         if len(final_sltd_list) == 0:
             final_sltd_list.append('Bún Thái')
             
-        # list_df_order = finalize_list_df_order_by_term(term)
-        # dish_list_res = dish_list(list_df_order)
-        
-        # with st.form(key='form-chon-mon-an'):
-        #     cols = st.columns(5)
-        #     for i, col in enumerate(cols):
-        #         sltd = col.selectbox('Chọn món', dish_list_res, key=i+5, index=len(dish_list_res)-1)
-        #         sltd_list.append(sltd)
-        #     col3, col4 = st.columns(2)
-        #     with col3:
-        #         metric_type = st.selectbox("Loại thống kê", metric_type_list)
-        #     submitted = st.form_submit_button('Thực hiện')
-
-        # list_df_order_grouping_cycle = finalize_list_df_order_grouping_cycle(list_df_order, sltd_list)
         list_df_order_grouping_cycle = get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
         list_df_order_grouping_cycle = markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
         
@@ -248,7 +234,7 @@ with tab2:
                     y=metric_type,
                     opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                     tooltip=[
-                        alt.Tooltip(metric_type, title="Value"),
+                        alt.Tooltip(metric_type, title=f"{metric_type}"),
                         alt.Tooltip('Cycle', title="Cycle"),
                         alt.Tooltip('Tên món', title="Tên món"),
                         alt.Tooltip(measure_delta[metric_type], title="Thay đổi")
@@ -263,20 +249,5 @@ with tab2:
             list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
             st.table(list_df_order_grouping_cycle.style.format({metric_type: '{:,.0f}'}))
         else:
-            # list_df_order_grouping_cycle = calculate_delta_measure_dish_by_cycle(list_df_order_grouping_cycle)
-            # print(list_df_order_grouping_cycle[['Min SL bán', '% Min SL bán']].head(20))
-            
-            # if metric_type == 'Total SL bán':
-            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Tổng SL bán')
-            # if metric_type == 'Max SL bán':
-            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Max SL bán')
-            # if metric_type == 'Min SL bán':
-            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Min SL bán')
-            # if metric_type == 'Avg SL bán':
-            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Avg SL bán')
-            # if metric_type == 'Median SL bán':
-            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Median SL bán')
-            # if metric_type == 'Mode SL bán':
-            #     fig_4 = get_fig4_chart(list_df_order_grouping_cycle, 'Mode SL bán')
             fig_4 = get_fig4_chart(list_df_order_grouping_cycle, metric_type)
             st.altair_chart(fig_4, use_container_width=True)

@@ -13,3 +13,29 @@ engine.execute("CREATE TABLE IF NOT EXISTS orders (ngay_number integer, ky text,
 # name = 'new-dataset'
 # ds = pd.DataFrame({'Name': ['Hai', 'Heo', 'Tin', 'Bo'], 'Age': [28, 18, 22, 28]})
 # ds.to_sql('%s' % (name),engine,index=False,if_exists='replace',chunksize=1000)
+
+"create table if not exists vegan_day (ngay_duong_number int, ngay_duong text, ngay_am text)"
+"drop table if exists vegan_day"
+"insert into vegan_day (ngay_duong, ngay_am) values ('2022-01-01', '2021-11-29'), ('2022-01-02', '2021-11-30'), ('2022-01-03', '2021-12-01'), ('2022-01-16', '2021-12-14'), ('2022-01-17', '2021-12-15'), ('2022-01-31', '2021-12-29'), ('2022-02-01', '2022-01-01')"
+"insert into vegan_day (ngay_duong, ngay_am) values ('2022-01-01', '2021-11-29'), ('2022-01-02', '2021-11-30'), ('2022-01-03', '2021-12-01'), ('2022-01-16', '2021-12-14'), ('2022-01-17', '2021-12-15'), ('2022-01-31', '2021-12-29'), ('2022-02-01', '2022-01-01')"
+
+
+""" 
+create or replace function add_new_col_vegan_day()
+returns trigger
+LANGUAGE PLPGSQL
+as $$
+BEGIN
+update vegan_day set ngay_duong_number = cast(concat(substring(ngay_duong, 1, 4), substring(ngay_duong, 6, 2), substring(ngay_duong, 9, 2)) as INTEGER);
+RETURN new;
+end;
+$$
+"""
+
+"""
+create trigger add_new_col_vegan_day
+after insert
+on vegan_day
+FOR EACH STATEMENT
+EXECUTE PROCEDURE add_new_col_vegan_day()
+"""
