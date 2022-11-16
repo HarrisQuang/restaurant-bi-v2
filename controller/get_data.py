@@ -76,6 +76,11 @@ def get_resolve_overlap_remove_extra_data_from_db():
     df.columns = data['completely_resolve_overlap_remove_extra_df_base_cols']
     return df
 
+def get_vegan_day_data_from_db():
+    result = engine.execute("SELECT * FROM vegan_day")
+    df = pd.DataFrame(result.fetchall())
+    return df
+
 def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
     refactor_term = []
     for el in term:

@@ -331,6 +331,10 @@ def get_default_params_prfs(df):
     dthu_type = ['BAEMIN', 'GRAB', 'SP-FOOD', 'Tại quán']
     return date_from, date_to, dthu_type
 
+def get_day_vegan_for_filter(df):
+    df['ngay_filter'] = df['ngay_duong'].apply(lambda x: x[8:10]) + '/' + df['ngay_duong'].apply(lambda x: x[5:7])
+    return df
+
 def percent_revenue_from_source(df, ds, de, options):
     df = df[['PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN', 'NGAY']]
     df.columns = ['BAEMIN', 'GRAB', 'SP-FOOD', 'Tại quán', 'Ngày']
