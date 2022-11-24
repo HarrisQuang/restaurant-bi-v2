@@ -204,19 +204,9 @@ def statistic_dish_by_cycle(df):
         temp = []
         for i, el1 in enumerate(df[el]):
             if df['flag'][i] == 0:
-                # temp.append('0%')
                 temp.append('0')
             else:
                 delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
-                # if delta > 0:
-                #     delta = '🔼 ' + str(delta) + '%'
-                #     temp.append(delta)
-                # elif delta == 0:
-                #     delta = '🔷 ' + str(delta) + '%'
-                #     temp.append(delta)
-                # else:
-                #     delta = '🔻 ' + str(delta) + '%'
-                #     temp.append(delta)
                 temp.append(delta)
         df[measure_delta[el]] = temp
     return df
@@ -332,7 +322,7 @@ def get_default_params_prfs(df):
     return date_from, date_to, dthu_type
 
 def get_day_vegan_for_filter(df):
-    df['ngay_filter'] = df['ngay_duong'].apply(lambda x: x[8:10]) + '/' + df['ngay_duong'].apply(lambda x: x[5:7])
+    df['ngay_filter'] = df['ngay_duong'].apply(lambda x: x[8:10]) + '/' + df['ngay_duong'].apply(lambda x: x[5:7]) + '/' + df['ngay_duong'].apply(lambda x: x[2:4]) + '(' + df['ngay_am'].apply(lambda x: x[8:10]) + ')'
     return df
 
 def percent_revenue_from_source(df, ds, de, options):
