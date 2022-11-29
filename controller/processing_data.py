@@ -188,6 +188,10 @@ def statistic_dish_by_cycle(df):
     df = pd.concat(part_df, axis=0)
     df['Cycle_number'] = df['Cycle'].apply(lambda x: int(x[3:] + x[0:2]))
     df = df.sort_values(by = ['Tên món', 'Cycle_number'], ascending = True).reset_index(drop = True)
+    df = calculate_percentage_change(df)
+    return df
+
+def calculate_percentage_change(df):
     measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
                      'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
     temp = []
@@ -484,6 +488,6 @@ def get_statistic_osed(df):
 if __name__ == "__main__":
     # df = export_one_df_order('ORDER 04-22')
     df = export_one_df_finance('THU CHI 05-22')
-    print(df.head(10))
-    print(df.dtypes)
+    # print(df.head(10))
+    # print(df.dtypes)
     

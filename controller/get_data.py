@@ -83,21 +83,23 @@ def get_vegan_day_data_from_db():
 
 def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
     refactor_term = []
-    for el in term:
-        refactor_term.append(el[6:])
-    refactor_term = tuple(refactor_term)
-    final_sltd_list = tuple(final_sltd_list)
-    if len(refactor_term) == 1 and len(final_sltd_list) == 1:
-        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon = '%s'" % (refactor_term[0], final_sltd_list[0]))
-    if len(refactor_term) == 1 and len(final_sltd_list) > 1:
-        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon in %s" % (refactor_term[0], final_sltd_list))
-    if len(refactor_term) > 1 and len(final_sltd_list) == 1:
-        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon = '%s'" % (refactor_term, final_sltd_list[0]))
-    if len(refactor_term) > 1 and len(final_sltd_list) > 1:
-        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon in %s" % (refactor_term, final_sltd_list))
-    df = pd.DataFrame(result.fetchall())
-    df.columns = data['completely_statistic_dish_by_cycle_df_base_cols']
-    print(df.head)
+    if len(term) == len(get_order_data_term_list()):
+        for el in term:
+            refactor_term.append(el[6:])
+        refactor_term = tuple(refactor_term)
+        final_sltd_list = tuple(final_sltd_list)
+        if len(refactor_term) == 1 and len(final_sltd_list) == 1:
+            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon = '%s'" % (refactor_term[0], final_sltd_list[0]))
+        if len(refactor_term) == 1 and len(final_sltd_list) > 1:
+            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon in %s" % (refactor_term[0], final_sltd_list))
+        if len(refactor_term) > 1 and len(final_sltd_list) == 1:
+            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon = '%s'" % (refactor_term, final_sltd_list[0]))
+        if len(refactor_term) > 1 and len(final_sltd_list) > 1:
+            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon in %s" % (refactor_term, final_sltd_list))
+        df = pd.DataFrame(result.fetchall())
+        df.columns = data['completely_statistic_dish_by_cycle_df_base_cols']
+    else:
+        pass
     return df
 
 def get_cycle_list_by_type(type):
@@ -262,4 +264,4 @@ def export_list_df_by_type(cycle, type, function):
 
 if __name__ == "__main__":
     res = create_df_order('ORDER 04-22')
-    print(res['df'].head())
+    # print(res['df'].head())

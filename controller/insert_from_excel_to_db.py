@@ -38,5 +38,5 @@ engine.execute(query_stmnt)
 ####update data
 ngay_number = 123
 part_stmt = "DOANH_THU = '%s', CHI_PHI = '%s', NET_SP_FOOD = '%s', GRAB = '%s', BAEMIN = '%s', CK_SP_FOOD = '%s', SP_FOOD = '%s', CK_GRAB = '%s', CK_BAEMIN = '%s', TAI_QUAN = '%s', PCT_BAEMIN = '%s', PCT_GRAB = '%s', PCT_SP_FOOD = '%s', PCT_TAI_QUAN = '%s' "
-final_stmt = "UPDATE finance SET " + part_stmt + "WHERE ngay_number = '%s'" %
+final_stmt = "UPDATE finance SET " + part_stmt + "WHERE ngay_number = '%s'" 
 engine.execute(final_stmt)
