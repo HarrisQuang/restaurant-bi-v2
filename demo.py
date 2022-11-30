@@ -6,8 +6,8 @@ import os, sys
 from controller.processing_data import *
 from controller.get_data import *
 
-today = date.today()
-today = str(today)
+# today = date.today()
+# today = str(today)
 # print(today[2:4], today[5:7])
 # print("Today's date:", today)
 
@@ -73,12 +73,12 @@ today = str(today)
 #     print(final_stmt)
 #     engine.execute(final_stmt)
 
-print(today)
-print(type(today))
+# print(today)
+# print(type(today))
 
-date = datetime(2022, 9, 30)
-date = str(date)
-print(date)
+# date = datetime(2022, 9, 30)
+# date = str(date)
+# print(date)
 
 
 #################################################################
@@ -107,3 +107,10 @@ print(date)
 
 # query_stmnt = "INSERT INTO orders (ngay_number, ky, ngay, so_hoa_don, ma_mon, ten_mon, sl_ban, don_gia, doanh_thu) " + root % ist_val
 # engine.execute(query_stmnt)
+
+if 2 < 1:
+    print("2<1")
+elif 3 > 2:
+    print("3>2")
+elif 6 > 5:
+    print("6>5")

@@ -4,6 +4,10 @@ import pandas as pd
 import json 
 from sqlalchemy import create_engine, text
 from datetime import date
+import os, sys
+path = os.path.abspath('./controller')
+sys.path.append(path)
+from processing_data import *
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
@@ -83,23 +87,30 @@ def get_vegan_day_data_from_db():
 
 def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
     refactor_term = []
-    if len(term) == len(get_order_data_term_list()):
-        for el in term:
-            refactor_term.append(el[6:])
-        refactor_term = tuple(refactor_term)
-        final_sltd_list = tuple(final_sltd_list)
-        if len(refactor_term) == 1 and len(final_sltd_list) == 1:
-            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon = '%s'" % (refactor_term[0], final_sltd_list[0]))
-        if len(refactor_term) == 1 and len(final_sltd_list) > 1:
-            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon in %s" % (refactor_term[0], final_sltd_list))
-        if len(refactor_term) > 1 and len(final_sltd_list) == 1:
-            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon = '%s'" % (refactor_term, final_sltd_list[0]))
-        if len(refactor_term) > 1 and len(final_sltd_list) > 1:
-            result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon in %s" % (refactor_term, final_sltd_list))
-        df = pd.DataFrame(result.fetchall())
+    total_count_term = len(get_order_data_term_list())
+    for el in term:
+        refactor_term.append(el[6:])
+    refactor_term = tuple(refactor_term)
+    final_sltd_list = tuple(final_sltd_list)
+    if len(refactor_term) == total_count_term and len(final_sltd_list) == 1:
+        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon = '%s'" % (refactor_term, final_sltd_list[0]))
+    elif len(refactor_term) == total_count_term and len(final_sltd_list) > 1:
+        result = engine.execute("SELECT * FROM statistic_dish_by_cycle where cycle in %s and ten_mon in %s" % (refactor_term, final_sltd_list))
+    elif len(refactor_term) > 1 and len(final_sltd_list) == 1:
+        result = engine.execute("SELECT cycle, ten_mon, tong_sl_ban, max_sl_ban, min_sl_ban, avg_sl_ban, median_sl_ban, mode_sl_ban, cycle_number FROM statistic_dish_by_cycle where cycle in %s and ten_mon = '%s'" % (refactor_term, final_sltd_list[0]))
+    elif len(refactor_term) > 1 and len(final_sltd_list) > 1:
+        result = engine.execute("SELECT cycle, ten_mon, tong_sl_ban, max_sl_ban, min_sl_ban, avg_sl_ban, median_sl_ban, mode_sl_ban, cycle_number FROM statistic_dish_by_cycle where cycle in %s and ten_mon in %s" % (refactor_term, final_sltd_list))
+    elif len(refactor_term) == 1 and len(final_sltd_list) == 1:
+        result = engine.execute("SELECT cycle, ten_mon, tong_sl_ban, max_sl_ban, min_sl_ban, avg_sl_ban, median_sl_ban, mode_sl_ban, cycle_number FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon = '%s'" % (refactor_term[0], final_sltd_list[0]))
+    elif len(refactor_term) == 1 and len(final_sltd_list) > 1:
+        result = engine.execute("SELECT cycle, ten_mon, tong_sl_ban, max_sl_ban, min_sl_ban, avg_sl_ban, median_sl_ban, mode_sl_ban, cycle_number FROM statistic_dish_by_cycle where cycle = '%s' and ten_mon in %s" % (refactor_term[0], final_sltd_list))
+    df = pd.DataFrame(result.fetchall())
+    if len(df.columns) == len(data['completely_statistic_dish_by_cycle_df_base_cols']):
         df.columns = data['completely_statistic_dish_by_cycle_df_base_cols']
     else:
-        pass
+        df.columns = data['completely_statistic_dish_by_cycle_df_base_cols'][:9]
+        df = calculate_percentage_change(df)
+        df[["% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"]] = df[["% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"]].astype(str)
     return df
 
 def get_cycle_list_by_type(type):
