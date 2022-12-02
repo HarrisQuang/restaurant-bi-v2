@@ -3,10 +3,10 @@ import numpy as np
 from datetime import datetime
 import json 
 import os, sys
-path = os.path.abspath('./controller')
+path = os.path.abspath('.')
 sys.path.append(path)
-from utils import *
-from get_data import *
+from controller.utils import *
+from controller.get_data import *
 from sqlalchemy import create_engine, text
 
 with open('config.json', "r", encoding='utf-8') as f:
@@ -164,7 +164,43 @@ def finalize_list_df_order_by_term(term):
         part_df.append(df)
     final_df = pd.concat(part_df, axis = 0)
     return final_df
-        
+
+def calculate_percentage_change(df):
+    measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+    temp = []
+    for i, val in enumerate(df['Tên món']):
+        if i == 0:
+            temp.append(0)
+        else:
+            if df['Tên món'][i] != df['Tên món'][i-1]:
+                temp.append(0)
+            else:
+                temp.append(1)
+    df['flag'] = temp
+    for el in measure_delta.keys():
+        temp = []
+        for i, el1 in enumerate(df[el]):
+            if df['flag'][i] == 0:
+                temp.append('0')
+            else:
+                delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
+                temp.append(delta)
+        df[measure_delta[el]] = temp
+    return df
+
+def generate_total_order_vegan_day():
+    df = get_total_order_grouping_day()
+    vegan_day_list = refactor_day_vegan()
+    print(vegan_day_list)
+    part_df = []
+    for vg_day in vegan_day_list:
+        temp_df = df[df['ngay_number'] == vg_day]
+        if not temp_df.empty:
+            part_df.append(temp_df)
+    df = pd.concat(part_df, axis=0)
+    return df 
+
 def statistic_dish_by_cycle(df):
     part_df = []
     count = 0
@@ -189,30 +225,6 @@ def statistic_dish_by_cycle(df):
     df['Cycle_number'] = df['Cycle'].apply(lambda x: int(x[3:] + x[0:2]))
     df = df.sort_values(by = ['Tên món', 'Cycle_number'], ascending = True).reset_index(drop = True)
     df = calculate_percentage_change(df)
-    return df
-
-def calculate_percentage_change(df):
-    measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
-                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
-    temp = []
-    for i, val in enumerate(df['Tên món']):
-        if i == 0:
-            temp.append(0)
-        else:
-            if df['Tên món'][i] != df['Tên món'][i-1]:
-                temp.append(0)
-            else:
-                temp.append(1)
-    df['flag'] = temp
-    for el in measure_delta.keys():
-        temp = []
-        for i, el1 in enumerate(df[el]):
-            if df['flag'][i] == 0:
-                temp.append('0')
-            else:
-                delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
-                temp.append(delta)
-        df[measure_delta[el]] = temp
     return df
 
 def markup_statistic_dish_by_cycle(df):
@@ -325,9 +337,10 @@ def get_default_params_prfs(df):
     dthu_type = ['BAEMIN', 'GRAB', 'SP-FOOD', 'Tại quán']
     return date_from, date_to, dthu_type
 
-def get_day_vegan_for_filter(df):
+def refactor_day_vegan():
+    df = get_vegan_day_data_from_db()
     df['ngay_filter'] = df['ngay_duong'].apply(lambda x: x[8:10]) + '/' + df['ngay_duong'].apply(lambda x: x[5:7]) + '/' + df['ngay_duong'].apply(lambda x: x[2:4]) + '(' + df['ngay_am'].apply(lambda x: x[8:10]) + ')'
-    return df
+    return df['ngay_filter'].tolist()
 
 def percent_revenue_from_source(df, ds, de, options):
     df = df[['PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN', 'NGAY']]

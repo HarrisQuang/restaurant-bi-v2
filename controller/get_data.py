@@ -7,7 +7,7 @@ from datetime import date
 import os, sys
 path = os.path.abspath('./controller')
 sys.path.append(path)
-from processing_data import *
+import processing_data as proda
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
@@ -80,6 +80,24 @@ def get_resolve_overlap_remove_extra_data_from_db():
     df.columns = data['completely_resolve_overlap_remove_extra_df_base_cols']
     return df
 
+def get_total_order_grouping_day():
+    result = engine.execute("SELECT ngay_number, max(ngay) ngay, count(*) total_order FROM orders group by ngay_number")
+    df = pd.DataFrame(result.fetchall())
+    return df
+
+def get_total_order_by_day(day_list):
+    refactor_day_list = []
+    for day in day_list:
+        day = '20' + day[6:8] + day[3:5] + day[0:2]
+        refactor_day_list.append(day)
+    refactor_day_tuple = tuple(refactor_day_list)
+    if len(refactor_day_tuple) == 1:
+        result = engine.execute("SELECT ngay_number, count(*) FROM orders where ngay_number = '%s' group by ngay_number" % (refactor_day_tuple[0]))
+    else:
+        result = engine.execute("SELECT ngay_number, count(*) FROM orders where ngay_number in %s group by ngay_number" % (refactor_day_tuple))
+    df = pd.DataFrame(result.fetchall())
+    return df
+    
 def get_vegan_day_data_from_db():
     result = engine.execute("SELECT * FROM vegan_day")
     df = pd.DataFrame(result.fetchall())
@@ -109,7 +127,7 @@ def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
         df.columns = data['completely_statistic_dish_by_cycle_df_base_cols']
     else:
         df.columns = data['completely_statistic_dish_by_cycle_df_base_cols'][:9]
-        df = calculate_percentage_change(df)
+        df = proda.calculate_percentage_change(df)
         df[["% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"]] = df[["% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"]].astype(str)
     return df
 

@@ -2,10 +2,11 @@ import streamlit as st
 import altair as alt
 import os, sys
 import numpy as np
+import json 
 path = os.path.abspath('.')
 sys.path.append(path)
-from controller.processing_data import *
-from controller.get_data import *
+import controller.processing_data as proda
+import controller.get_data as geda
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
@@ -27,8 +28,8 @@ with tab1:
         
     with placeholder.container():
         st.markdown("### Chọn kỳ báo cáo")
-        finance_data_name_list = get_finance_data_term_list()
-        order_data_name_list = get_order_data_term_list()
+        finance_data_name_list = geda.get_finance_data_term_list()
+        order_data_name_list = geda.get_order_data_term_list()
         with st.form(key='form-chon-ky-bao-cao'):
             col1, col2 = st.columns(2)
             with col1:
@@ -36,8 +37,8 @@ with tab1:
             with col2:
                 sld_order_report = st.selectbox("Kỳ báo cáo đơn hàng", order_data_name_list, index = len(order_data_name_list)-1)
             submitted = st.form_submit_button('Thực hiện')
-        df_finance = finalize_one_df_finance_by_term(sld_finance_report)
-        df_order = finalize_one_df_order_by_term(sld_order_report)
+        df_finance = proda.finalize_one_df_finance_by_term(sld_finance_report)
+        df_order = proda.finalize_one_df_order_by_term(sld_order_report)
         st.markdown("### Tổng quan doanh thu, chi phí")
         hover = alt.selection_single(fields=["Sub-cate"],nearest=True,on="mouseover",empty="none")
 
@@ -45,7 +46,7 @@ with tab1:
         range_ = ['#01A14B', '#4AC7C3', 'grey', '#4AC7C3', '#01A14B', '#E24A2C', '#E24A2C', 'grey']
         sub_cate_order = ['GRAB', 'SP-FOOD', 'BAEMIN', 'TAI-QUAN', 'CK-GRAB', 'CK-SP-FOOD', 'CK-BAEMIN', 'CHI-PHI']
 
-        revenue_cost_overal = revenue_cost_overal(df_finance)
+        revenue_cost_overal = proda.revenue_cost_overal(df_finance)
 
         fig = alt.Chart(revenue_cost_overal).mark_bar().encode(x=alt.X('Main-cate:N', title=None, axis=alt.Axis(labelColor=label_colors), 
                                                                 sort=['DOANH-THU', 'CHI-PHI']), 
@@ -68,7 +69,7 @@ with tab1:
         strokeWidth=0), use_container_width=False)
         
         st.markdown("### Tỷ trọng doanh thu")
-        date_from, date_to, dthu_type = get_default_params_prfs(df_finance)
+        date_from, date_to, dthu_type = proda.get_default_params_prfs(df_finance)
         
         with st.form(key='form-ty-trong-dthu'):
             col3, col4 = st.columns(2) 
@@ -80,30 +81,30 @@ with tab1:
             with col5:
                 options = st.multiselect('Chọn nguồn doanh thu', dthu_type)
             submitted = st.form_submit_button('Thực hiện')
-        percent_revenue_from_source = percent_revenue_from_source(df_finance, ds, de, options)
+        percent_revenue_from_source = proda.percent_revenue_from_source(df_finance, ds, de, options)
         fig_2 = alt.Chart(percent_revenue_from_source).mark_line().encode(x = 'Ngày:O', y = 'Tỷ-lệ-%:Q', color = 'Nguồn-doanh-thu:N', strokeDash='Nguồn-doanh-thu:N')
         st.text(" ")
         st.text(" ")
         st.text(" ")
         if de > ds:
             st.altair_chart(fig_2, use_container_width=True)
-        get_statistic_prfs = get_statistic_prfs(percent_revenue_from_source, options)
+        get_statistic_prfs = proda.get_statistic_prfs(percent_revenue_from_source, options)
         st.table(get_statistic_prfs.style.format({'Max (Tỷ lệ %)': '{:,.2f}', 'Min (Tỷ lệ %)': '{:,.2f}',
                                             'Avg (Tỷ lệ %)': '{:,.2f}'}))
         
         st.markdown("### Số lượng (đơn hàng) bán mỗi ngày")
-        order_sale_every_day = order_sale_every_day(df_order)
+        order_sale_every_day = proda.order_sale_every_day(df_order)
         fig_4 = alt.Chart(order_sale_every_day).mark_line().encode(
         x = 'Ngày:O',
         y = 'SL hóa đơn:Q')
         st.altair_chart(fig_4, use_container_width=True)
         
-        get_statistic_osed = get_statistic_osed(order_sale_every_day)
+        get_statistic_osed = proda.get_statistic_osed(order_sale_every_day)
         st.table(get_statistic_osed.style.format({'Max (SL hóa đơn)': '{:,.0f}', 'Min (SL hóa đơn)': '{:,.0f}',
                                             'Avg (SL hóa đơn)': '{:,.2f}', 'Median (SL hóa đơn)': '{:,.0f}', 'Mode (SL hóa đơn)': '{:,.0f}'}))
         
         st.markdown("### Món bán chạy")
-        date_from, date_to = get_default_params_bsd(df_order)
+        date_from, date_to = proda.get_default_params_bsd(df_order)
         with st.form(key='form-mon-ban-chay'):
             col7, col8 = st.columns(2)
             with col7:
@@ -112,13 +113,13 @@ with tab1:
                 de = st.date_input("Ngày kết thúc", date_to, date_from, date_to)
             submitted = st.form_submit_button('Thực hiện')
         
-        df_order_top, top_slider = top_slider(df_order, ds, de)
+        df_order_top, top_slider = proda.top_slider(df_order, ds, de)
         col9, col10 = st.columns(2)
         with col9:
             top_quantity = st.slider("Top SL:", 1, top_slider, 10)
         with col10:
             top_revenue = st.slider("Top Doanh thu:", 1, top_slider, 10)
-        top_dish_quantity, top_dish_revenue = top_seller_dish(df_order_top, top_quantity, top_revenue)
+        top_dish_quantity, top_dish_revenue = proda.top_seller_dish(df_order_top, top_quantity, top_revenue)
         col11, col12 = st.columns(2)
         with col11:
             st.write('Top món ăn theo số lượng bán')
@@ -130,7 +131,7 @@ with tab1:
                                             'Doanh thu': '{:,.0f}'}))
         
         st.markdown("### Số lượng (món ăn) bán mỗi ngày")
-        dish_list_res = dish_list(df_order)
+        dish_list_res = proda.dish_list(df_order)
         sltd_list = []
         with st.form(key='form-mon-ban-moi-ngay'):
             cols = st.columns(5)
@@ -138,7 +139,7 @@ with tab1:
                 sltd = col.selectbox('Chọn món', dish_list_res, key=i, index=len(dish_list_res)-1)
                 sltd_list.append(sltd)
             submitted = st.form_submit_button('Thực hiện')
-        dish_sale_every_day = dish_sale_every_day(df_order, sltd_list)
+        dish_sale_every_day = proda.dish_sale_every_day(df_order, sltd_list)
         
         if dish_sale_every_day[0] != 1:
             fig_3 = alt.Chart(dish_sale_every_day[1]).mark_line().encode(
@@ -148,7 +149,7 @@ with tab1:
             strokeDash='Tên món:N')
             st.altair_chart(fig_3, use_container_width=True)
         
-        get_statistic_dsed = get_statistic_dsed(df_order, sltd_list)
+        get_statistic_dsed = proda.get_statistic_dsed(df_order, sltd_list)
         st.table(get_statistic_dsed.style.format({'Max (SL bán)': '{:,.0f}', 'Min (SL bán)': '{:,.0f}',
                                             'Avg (SL bán)': '{:,.2f}', 'Median (SL bán)': '{:,.0f}', 'Mode (SL bán)': '{:,.0f}'}))
 
@@ -161,7 +162,7 @@ with tab2:
         
     with placeholder.container():
         st.markdown("### Tỷ trọng doanh thu")
-        finance_term_list = get_finance_data_term_list()
+        finance_term_list = geda.get_finance_data_term_list()
         
         with st.form(key='form-chon-cycle-ty-trong-dthu'):
             col1, col2 = st.columns(2)
@@ -176,8 +177,8 @@ with tab2:
             submitted = st.form_submit_button('Thực hiện')
         
         st.markdown("### Món ăn")
-        order_term_list = get_order_data_term_list()
-        dish_list = get_order_data_dish_list()
+        order_term_list = geda.get_order_data_term_list()
+        dish_list = geda.get_order_data_dish_list()
         sltd_list = []
         metric_type_list = ['...', 'Tổng SL bán', 'Max SL bán', 'Min SL bán', 'Avg SL bán', 'Median SL bán', 
                             'Mode SL bán']
@@ -196,7 +197,7 @@ with tab2:
             submitted = st.form_submit_button('Thực hiện')
         
         if not term:
-            term = [get_order_data_term_list()[-1]]
+            term = [order_term_list[-1]]
             
         if metric_type == '...':
             metric_type = 'Tổng SL bán'
@@ -208,8 +209,8 @@ with tab2:
         if len(final_sltd_list) == 0:
             final_sltd_list.append('Bún Thái')
             
-        list_df_order_grouping_cycle = get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
-        list_df_order_grouping_cycle = markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
+        list_df_order_grouping_cycle = geda.get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
+        list_df_order_grouping_cycle = proda.markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
         
         def get_fig4_chart(data, metric_type):
             hover = alt.selection_single(
@@ -245,9 +246,24 @@ with tab2:
             return (lines + points + tooltips).interactive()
         
         if not term or len(term) == 1:
-            list_df_order_grouping_cycle = sort_df(list_df_order_grouping_cycle, metric_type)
+            list_df_order_grouping_cycle = proda.sort_df(list_df_order_grouping_cycle, metric_type)
             list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
             st.table(list_df_order_grouping_cycle.style.format({metric_type: '{:,.0f}'}))
         else:
             fig_4 = get_fig4_chart(list_df_order_grouping_cycle, metric_type)
             st.altair_chart(fig_4, use_container_width=True)
+        
+        st.markdown("### Đơn hàng ngày chay")
+        vegan_day_list = proda.refactor_day_vegan()
+        
+        with st.form(key='form-chon-ngay-chay'):
+            col1, col2 = st.columns(2)
+            with col1:
+                vegan_day = st.multiselect('Chọn ngày chay', vegan_day_list)
+            submitted = st.form_submit_button('Thực hiện')
+        
+        if not vegan_day:
+            vegan_day = [vegan_day_list[-1]]
+        
+        total_order_by_day = geda.get_total_order_by_day(vegan_day)
+        st.table(total_order_by_day)
