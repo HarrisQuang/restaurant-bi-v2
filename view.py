@@ -254,7 +254,7 @@ with tab2:
             st.altair_chart(fig_4, use_container_width=True)
         
         st.markdown("### Đơn hàng ngày chay")
-        vegan_day_list = proda.refactor_day_vegan()
+        vegan_day_list = geda.get_existing_vegan_day()
         
         with st.form(key='form-chon-ngay-chay'):
             col1, col2 = st.columns(2)

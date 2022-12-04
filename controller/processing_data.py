@@ -190,16 +190,15 @@ def calculate_percentage_change(df):
     return df
 
 def generate_total_order_vegan_day():
-    df = get_total_order_grouping_day()
-    vegan_day_list = refactor_day_vegan()
-    print(vegan_day_list)
-    part_df = []
-    for vg_day in vegan_day_list:
-        temp_df = df[df['ngay_number'] == vg_day]
-        if not temp_df.empty:
-            part_df.append(temp_df)
-    df = pd.concat(part_df, axis=0)
-    return df 
+    ####
+    total_order_grouping_day = get_total_order_grouping_day()
+    print(total_order_grouping_day[total_order_grouping_day['ngay_number'] == int('20220529')])
+    vegan_day_list = get_vegan_day_data()
+    print(vegan_day_list[vegan_day_list['ngay_duong_number'] == int('20220529')])
+    total_order_vegan_day = total_order_grouping_day.merge(vegan_day_list, left_on = 'ngay_number', right_on = 'ngay_duong_number')
+    total_order_vegan_day['ngay_filter'] = total_order_vegan_day['ngay_duong'].apply(lambda x: x[8:10]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[5:7]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[2:4]) + '(' + total_order_vegan_day['ngay_am'].apply(lambda x: x[8:10]) + ')'
+    total_order_vegan_day = total_order_vegan_day.sort_values(by='ngay_number')
+    return total_order_vegan_day 
 
 def statistic_dish_by_cycle(df):
     part_df = []
@@ -336,11 +335,6 @@ def get_default_params_prfs(df):
     date_to = np.max(df['NGAY'])
     dthu_type = ['BAEMIN', 'GRAB', 'SP-FOOD', 'Tại quán']
     return date_from, date_to, dthu_type
-
-def refactor_day_vegan():
-    df = get_vegan_day_data_from_db()
-    df['ngay_filter'] = df['ngay_duong'].apply(lambda x: x[8:10]) + '/' + df['ngay_duong'].apply(lambda x: x[5:7]) + '/' + df['ngay_duong'].apply(lambda x: x[2:4]) + '(' + df['ngay_am'].apply(lambda x: x[8:10]) + ')'
-    return df['ngay_filter'].tolist()
 
 def percent_revenue_from_source(df, ds, de, options):
     df = df[['PCT-BAEMIN', 'PCT-GRAB', 'PCT-SP-FOOD', 'PCT-TAI-QUAN', 'NGAY']]

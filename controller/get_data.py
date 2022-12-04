@@ -81,25 +81,31 @@ def get_resolve_overlap_remove_extra_data_from_db():
     return df
 
 def get_total_order_grouping_day():
+    ####
     result = engine.execute("SELECT ngay_number, max(ngay) ngay, count(*) total_order FROM orders group by ngay_number")
     df = pd.DataFrame(result.fetchall())
     return df
 
-def get_total_order_by_day(day_list):
-    refactor_day_list = []
-    for day in day_list:
-        day = '20' + day[6:8] + day[3:5] + day[0:2]
-        refactor_day_list.append(day)
-    refactor_day_tuple = tuple(refactor_day_list)
-    if len(refactor_day_tuple) == 1:
-        result = engine.execute("SELECT ngay_number, count(*) FROM orders where ngay_number = '%s' group by ngay_number" % (refactor_day_tuple[0]))
-    else:
-        result = engine.execute("SELECT ngay_number, count(*) FROM orders where ngay_number in %s group by ngay_number" % (refactor_day_tuple))
+def get_vegan_day_data():
+    ####
+    result = engine.execute("SELECT * FROM vegan_day")
     df = pd.DataFrame(result.fetchall())
     return df
-    
-def get_vegan_day_data_from_db():
-    result = engine.execute("SELECT * FROM vegan_day")
+
+def get_existing_vegan_day():
+    result = engine.execute("SELECT ngay_filter FROM total_order_vegan_day")
+    df = pd.DataFrame(result.fetchall())
+    result = df['ngay_filter'].tolist()
+    return result
+
+def get_total_order_by_day(day_list):
+    ####
+    day_list = tuple(day_list)
+    print(day_list)
+    if len(day_list) == 1:
+        result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter = '%s'" % (day_list[0]))
+    else:
+        result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter in %s" % (day_list,))
     df = pd.DataFrame(result.fetchall())
     return df
 
