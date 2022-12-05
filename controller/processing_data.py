@@ -165,20 +165,18 @@ def finalize_list_df_order_by_term(term):
     final_df = pd.concat(part_df, axis = 0)
     return final_df
 
-def calculate_percentage_change(df):
-    measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
-                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+def calculate_percentage_change(df, orgin, criteria):
     temp = []
-    for i, val in enumerate(df['Tên món']):
+    for i, val in enumerate(df[orgin]):
         if i == 0:
             temp.append(0)
         else:
-            if df['Tên món'][i] != df['Tên món'][i-1]:
+            if df[orgin][i] != df[orgin][i-1]:
                 temp.append(0)
             else:
                 temp.append(1)
     df['flag'] = temp
-    for el in measure_delta.keys():
+    for el in criteria.keys():
         temp = []
         for i, el1 in enumerate(df[el]):
             if df['flag'][i] == 0:
@@ -186,7 +184,7 @@ def calculate_percentage_change(df):
             else:
                 delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
                 temp.append(delta)
-        df[measure_delta[el]] = temp
+        df[criteria[el]] = temp
     return df
 
 def generate_total_order_vegan_day():
@@ -220,11 +218,12 @@ def statistic_dish_by_cycle(df):
     df = pd.concat(part_df, axis=0)
     df['Cycle_number'] = df['Cycle'].apply(lambda x: int(x[3:] + x[0:2]))
     df = df.sort_values(by = ['Tên món', 'Cycle_number'], ascending = True).reset_index(drop = True)
-    df = calculate_percentage_change(df)
+    measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+    df = calculate_percentage_change(df, 'Tên món', measure_delta)
     return df
 
-def markup_statistic_dish_by_cycle(df):
-    markup_cols = data['completely_statistic_dish_by_cycle_df_base_cols'][10:]
+def markup_percentage_change(df, markup_cols):
     for el in markup_cols:
         temp = []
         for val in df[el].values:
@@ -238,6 +237,16 @@ def markup_statistic_dish_by_cycle(df):
                 val = '🔻 ' + val + '%'
                 temp.append(val)
         df[el] = temp
+    return df
+        
+def markup_statistic_dish_by_cycle(df):
+    markup_cols = data['completely_statistic_dish_by_cycle_df_base_cols'][10:]
+    df = markup_percentage_change(df, markup_cols)
+    return df
+
+def markup_total_order_vegan_day(df):
+    markup_cols = ['% total_order']
+    df = markup_percentage_change(df, markup_cols)
     return df
 
 def finalize_list_df_order_grouping_cycle(df, sltd_list):

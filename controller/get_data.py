@@ -81,13 +81,11 @@ def get_resolve_overlap_remove_extra_data_from_db():
     return df
 
 def get_total_order_grouping_day():
-    ####
     result = engine.execute("SELECT ngay_number, max(ngay) ngay, count(*) total_order FROM orders group by ngay_number")
     df = pd.DataFrame(result.fetchall())
     return df
 
 def get_vegan_day_data():
-    ####
     result = engine.execute("SELECT * FROM vegan_day")
     df = pd.DataFrame(result.fetchall())
     return df
@@ -99,13 +97,14 @@ def get_existing_vegan_day():
     return result
 
 def get_total_order_by_day(day_list):
-    ####
     day_list = tuple(day_list)
     if len(day_list) == 1:
         result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter = '%s'" % (day_list[0]))
     else:
         result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter in %s" % (day_list,))
     df = pd.DataFrame(result.fetchall())
+    measure_delta = {'total_order': '% total_order'}
+    df = proda.calculate_percentage_change(df, 'ngay_filter', measure_delta)
     return df
 
 def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
@@ -132,7 +131,9 @@ def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
         df.columns = data['completely_statistic_dish_by_cycle_df_base_cols']
     else:
         df.columns = data['completely_statistic_dish_by_cycle_df_base_cols'][:9]
-        df = proda.calculate_percentage_change(df)
+        measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+        df = proda.calculate_percentage_change(df, 'Tên món', measure_delta)
         df[["% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"]] = df[["% Tổng SL bán", "% Max SL bán", "% Min SL bán", "% Avg SL bán", "% Median SL bán", "% Mode SL bán"]].astype(str)
     return df
 

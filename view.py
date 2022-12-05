@@ -212,6 +212,48 @@ with tab2:
         list_df_order_grouping_cycle = geda.get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
         list_df_order_grouping_cycle = proda.markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
         
+        def get_line_chart(data, x, y, measure_delta, cate = None):
+            hover = alt.selection_single(
+                fields=[x],
+                nearest=True,
+                on="mouseover",
+                empty="none",
+            )
+            if cate != None:
+                lines = alt.Chart(data).mark_line().encode(
+                            x = x + ':O',
+                            y = y + ':Q',
+                            color = cate + ':N',
+                            strokeDash = cate + ':N')
+                tooltip=[
+                        alt.Tooltip(y, title=y),
+                        alt.Tooltip(x, title="Cycle"),
+                        alt.Tooltip(cate, title=cate),
+                        alt.Tooltip(measure_delta[y], title="Thay đổi")
+                    ]
+            else:
+                lines = alt.Chart(data).mark_line().encode(
+                            x = x + ':O',
+                            y = y + ':Q')
+                tooltip=[
+                        alt.Tooltip(y, title=y),
+                        alt.Tooltip(x, title=x),
+                        alt.Tooltip(measure_delta[y], title="Thay đổi")
+                    ]
+            points = lines.transform_filter(hover).mark_circle(size=65)
+            tooltips = (
+                alt.Chart(data)
+                .mark_rule()
+                .encode(
+                    x=x,
+                    y=y,
+                    opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
+                    tooltip=tooltip
+                )
+                .add_selection(hover)
+            )
+            return (lines + points + tooltips).interactive()
+        
         def get_fig4_chart(data, metric_type):
             hover = alt.selection_single(
                 fields=["Cycle"],
@@ -250,8 +292,12 @@ with tab2:
             list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
             st.table(list_df_order_grouping_cycle.style.format({metric_type: '{:,.0f}'}))
         else:
-            fig_4 = get_fig4_chart(list_df_order_grouping_cycle, metric_type)
+            measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
+                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
+            fig_4 = get_line_chart(data = list_df_order_grouping_cycle, x = 'Cycle', y = metric_type, measure_delta = measure_delta, cate = 'Tên món')
             st.altair_chart(fig_4, use_container_width=True)
+            # fig_4 = get_fig4_chart(list_df_order_grouping_cycle, metric_type)
+            # st.altair_chart(fig_4, use_container_width=True)
         
         st.markdown("### Đơn hàng ngày chay")
         vegan_day_list = geda.get_existing_vegan_day()
@@ -266,4 +312,5 @@ with tab2:
             vegan_day = [vegan_day_list[-1]]
         
         total_order_by_day = geda.get_total_order_by_day(vegan_day)
+        total_order_by_day = proda.markup_total_order_vegan_day(total_order_by_day)
         st.table(total_order_by_day)
