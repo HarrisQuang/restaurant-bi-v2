@@ -101,7 +101,6 @@ def get_existing_vegan_day():
 def get_total_order_by_day(day_list):
     ####
     day_list = tuple(day_list)
-    print(day_list)
     if len(day_list) == 1:
         result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter = '%s'" % (day_list[0]))
     else:

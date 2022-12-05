@@ -190,11 +190,8 @@ def calculate_percentage_change(df):
     return df
 
 def generate_total_order_vegan_day():
-    ####
     total_order_grouping_day = get_total_order_grouping_day()
-    print(total_order_grouping_day[total_order_grouping_day['ngay_number'] == int('20220529')])
     vegan_day_list = get_vegan_day_data()
-    print(vegan_day_list[vegan_day_list['ngay_duong_number'] == int('20220529')])
     total_order_vegan_day = total_order_grouping_day.merge(vegan_day_list, left_on = 'ngay_number', right_on = 'ngay_duong_number')
     total_order_vegan_day['ngay_filter'] = total_order_vegan_day['ngay_duong'].apply(lambda x: x[8:10]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[5:7]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[2:4]) + '(' + total_order_vegan_day['ngay_am'].apply(lambda x: x[8:10]) + ')'
     total_order_vegan_day = total_order_vegan_day.sort_values(by='ngay_number')
