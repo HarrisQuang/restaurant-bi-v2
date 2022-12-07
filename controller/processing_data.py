@@ -165,13 +165,20 @@ def finalize_list_df_order_by_term(term):
     final_df = pd.concat(part_df, axis = 0)
     return final_df
 
-def calculate_percentage_change(df, orgin, criteria):
+def calculate_percentage_change(df, orgin, criteria, grouping = True):
     temp = []
-    for i, val in enumerate(df[orgin]):
-        if i == 0:
-            temp.append(0)
-        else:
-            if df[orgin][i] != df[orgin][i-1]:
+    if grouping == True:
+        for i, val in enumerate(df[orgin]):
+            if i == 0:
+                temp.append(0)
+            else:
+                if df[orgin][i] != df[orgin][i-1]:
+                    temp.append(0)
+                else:
+                    temp.append(1)
+    else:
+        for i, val in enumerate(df[orgin]):
+            if i == 0:
                 temp.append(0)
             else:
                 temp.append(1)
@@ -226,6 +233,7 @@ def statistic_dish_by_cycle(df):
 def markup_percentage_change(df, markup_cols):
     for el in markup_cols:
         temp = []
+        df[el] = df[el].astype(str)
         for val in df[el].values:
             if float(val) > 0:
                 val = '🔼 ' + val + '%'
@@ -245,7 +253,7 @@ def markup_statistic_dish_by_cycle(df):
     return df
 
 def markup_total_order_vegan_day(df):
-    markup_cols = ['% total_order']
+    markup_cols = ['% Số đơn hàng']
     df = markup_percentage_change(df, markup_cols)
     return df
 

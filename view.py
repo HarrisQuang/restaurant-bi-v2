@@ -212,7 +212,7 @@ with tab2:
         list_df_order_grouping_cycle = geda.get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
         list_df_order_grouping_cycle = proda.markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
         
-        def get_line_chart(data, x, y, measure_delta, cate = None):
+        def get_line_chart(data, x, y, measure_delta, cate = None, sorting = False):
             hover = alt.selection_single(
                 fields=[x],
                 nearest=True,
@@ -220,11 +220,18 @@ with tab2:
                 empty="none",
             )
             if cate != None:
-                lines = alt.Chart(data).mark_line().encode(
-                            x = x + ':O',
-                            y = y + ':Q',
-                            color = cate + ':N',
-                            strokeDash = cate + ':N')
+                if sorting == False:
+                    lines = alt.Chart(data).mark_line().encode(
+                                x = x + ':O',
+                                y = y + ':Q',
+                                color = cate + ':N',
+                                strokeDash = cate + ':N')
+                else:
+                    lines = alt.Chart(data).mark_line().encode(
+                                x = alt.X(x + ':O', sort = data[x].tolist()),
+                                y = y + ':Q',
+                                color = cate + ':N',
+                                strokeDash = cate + ':N')
                 tooltip=[
                         alt.Tooltip(y, title=y),
                         alt.Tooltip(x, title="Cycle"),
@@ -232,9 +239,14 @@ with tab2:
                         alt.Tooltip(measure_delta[y], title="Thay đổi")
                     ]
             else:
-                lines = alt.Chart(data).mark_line().encode(
-                            x = x + ':O',
-                            y = y + ':Q')
+                if sorting == False:
+                    lines = alt.Chart(data).mark_line().encode(
+                                x = x + ':O',
+                                y = y + ':Q')
+                else:
+                    lines = alt.Chart(data).mark_line().encode(
+                                x = alt.X(x + ':O', sort = data[x].tolist()),
+                                y = y + ':Q')
                 tooltip=[
                         alt.Tooltip(y, title=y),
                         alt.Tooltip(x, title=x),
@@ -245,7 +257,7 @@ with tab2:
                 alt.Chart(data)
                 .mark_rule()
                 .encode(
-                    x=x,
+                    x = alt.X(x + ':O'),
                     y=y,
                     opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                     tooltip=tooltip
@@ -287,7 +299,7 @@ with tab2:
             )
             return (lines + points + tooltips).interactive()
         
-        if not term or len(term) == 1:
+        if len(term) == 1:
             list_df_order_grouping_cycle = proda.sort_df(list_df_order_grouping_cycle, metric_type)
             list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
             st.table(list_df_order_grouping_cycle.style.format({metric_type: '{:,.0f}'}))
@@ -313,4 +325,11 @@ with tab2:
         
         total_order_by_day = geda.get_total_order_by_day(vegan_day)
         total_order_by_day = proda.markup_total_order_vegan_day(total_order_by_day)
-        st.table(total_order_by_day)
+        print(total_order_by_day)
+        
+        if len(vegan_day) == 1:
+            st.table(total_order_by_day)
+        else:
+            measure_delta = {'Số đơn hàng': '% Số đơn hàng'}
+            fig_5 = get_line_chart(data = total_order_by_day, x = 'Ngày', y = 'Số đơn hàng', measure_delta = measure_delta, sorting = True)
+            st.altair_chart(fig_5, use_container_width=True)

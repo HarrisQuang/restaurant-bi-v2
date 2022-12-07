@@ -99,12 +99,15 @@ def get_existing_vegan_day():
 def get_total_order_by_day(day_list):
     day_list = tuple(day_list)
     if len(day_list) == 1:
-        result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter = '%s'" % (day_list[0]))
+        result = engine.execute("SELECT ngay_number, ngay_filter, total_order FROM total_order_vegan_day where ngay_filter = '%s'" % (day_list[0]))
     else:
-        result = engine.execute("SELECT ngay_filter, total_order FROM total_order_vegan_day where ngay_filter in %s" % (day_list,))
+        result = engine.execute("SELECT ngay_number, ngay_filter, total_order FROM total_order_vegan_day where ngay_filter in %s" % (day_list,))
     df = pd.DataFrame(result.fetchall())
-    measure_delta = {'total_order': '% total_order'}
-    df = proda.calculate_percentage_change(df, 'ngay_filter', measure_delta)
+    df = df.sort_values(by = 'ngay_number', ascending = True)
+    df = df[['ngay_filter', 'total_order']]
+    df.columns = ['Ngày', 'Số đơn hàng']
+    measure_delta = {'Số đơn hàng': '% Số đơn hàng'}
+    df = proda.calculate_percentage_change(df, 'Ngày', measure_delta, grouping = False)
     return df
 
 def get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list):
