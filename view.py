@@ -257,7 +257,7 @@ with tab2:
                 alt.Chart(data)
                 .mark_rule()
                 .encode(
-                    x = alt.X(x + ':O'),
+                    x = alt.X(x + ':O', sort = data[x].tolist()),
                     y=y,
                     opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                     tooltip=tooltip
@@ -325,7 +325,6 @@ with tab2:
         
         total_order_by_day = geda.get_total_order_by_day(vegan_day)
         total_order_by_day = proda.markup_total_order_vegan_day(total_order_by_day)
-        print(total_order_by_day)
         
         if len(vegan_day) == 1:
             st.table(total_order_by_day)

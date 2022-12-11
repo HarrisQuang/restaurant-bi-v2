@@ -192,13 +192,14 @@ def calculate_percentage_change(df, orgin, criteria, grouping = True):
                 delta = round((df[el][i] - df[el][i-1])/df[el][i-1]*100, 2)
                 temp.append(delta)
         df[criteria[el]] = temp
+    df = df.drop('flag', axis = 1)
     return df
 
 def generate_total_order_vegan_day():
     total_order_grouping_day = get_total_order_grouping_day()
     vegan_day_list = get_vegan_day_data()
     total_order_vegan_day = total_order_grouping_day.merge(vegan_day_list, left_on = 'ngay_number', right_on = 'ngay_duong_number')
-    total_order_vegan_day['ngay_filter'] = total_order_vegan_day['ngay_duong'].apply(lambda x: x[8:10]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[5:7]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[2:4]) + '(' + total_order_vegan_day['ngay_am'].apply(lambda x: x[8:10]) + ')'
+    total_order_vegan_day['ngay_filter'] = total_order_vegan_day['ngay_duong'].apply(lambda x: x[8:10]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[5:7]) + '/' + total_order_vegan_day['ngay_duong'].apply(lambda x: x[2:4]) + '(' + total_order_vegan_day['ngay_am'].apply(lambda x: x[8:10]) + '/' + total_order_vegan_day['ngay_am'].apply(lambda x: x[5:7]) + ')'
     total_order_vegan_day = total_order_vegan_day.sort_values(by='ngay_number')
     return total_order_vegan_day 
 
