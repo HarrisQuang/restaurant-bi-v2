@@ -86,14 +86,16 @@ def get_total_order_grouping_day():
     return df
 
 def generate_total_sale_grouping_cycle_and_dish():
-    result = engine.execute("SELECT cycle, ten_mon, sum(sl_ban) total_sl_ban, sum(sl_ban) * max(don_gia) dthu FROM resolve_overlap_dish_remove_extra_fee group by cycle, ten_mon order by cycle")
+    result = engine.execute("SELECT cycle, ten_mon, max(don_gia) don_gia, sum(sl_ban) total_sl_ban, sum(sl_ban) * max(don_gia) dthu FROM resolve_overlap_dish_remove_extra_fee group by cycle, ten_mon order by cycle")
     df = pd.DataFrame(result.fetchall())
     return df
 
 def get_total_sale_grouping_cycle_and_dish(cycle):
-    result = engine.execute("SELECT * FROM total_sale_grouping_cycle_dish where cycle = f'{cycle}'")
+    cycle = cycle[6:]
+    result = engine.execute(f"SELECT * FROM total_sale_grouping_cycle_dish where cycle = '{cycle}'")
     df = pd.DataFrame(result.fetchall())
-    return df
+    df.columns = ['Kỳ', 'Tên món', 'Đơn giá', 'SL bán', 'Doanh thu']
+    return df, df.shape[0]
     
 def get_vegan_day_data():
     result = engine.execute("SELECT * FROM vegan_day")

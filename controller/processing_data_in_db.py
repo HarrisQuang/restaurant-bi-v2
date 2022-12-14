@@ -110,10 +110,10 @@ print('Start processing data in DB')
 
 total_sale_grouping_cycle_dish = generate_total_sale_grouping_cycle_and_dish()
 
-engine.execute("CREATE TABLE IF NOT EXISTS total_sale_grouping_cycle_dish (cycle text, ten_mon text, total_sl_ban float, dthu float)")
+engine.execute("CREATE TABLE IF NOT EXISTS total_sale_grouping_cycle_dish (cycle text, ten_mon text, don_gia float, total_sl_ban float, dthu float)")
 
 root = "VALUES "
-loop = "('%s','%s','%s','%s')"
+loop = "('%s','%s','%s','%s','%s')"
 for i in range(total_sale_grouping_cycle_dish.shape[0]):
     if i == 0:
         root = root + loop
@@ -130,7 +130,7 @@ for id, row in total_sale_grouping_cycle_dish.iterrows():
         
 ist_val = tuple(ist_val)
 
-query_stmnt = "INSERT INTO total_sale_grouping_cycle_dish (cycle, ten_mon, total_sl_ban, dthu) " + root % ist_val
+query_stmnt = "INSERT INTO total_sale_grouping_cycle_dish (cycle, ten_mon, don_gia, total_sl_ban, dthu) " + root % ist_val
 engine.execute(query_stmnt)
 
 ########################################################################

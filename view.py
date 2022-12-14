@@ -249,17 +249,28 @@ with tab2:
         
         st.markdown("### Món bán chạy")
         order_term_list = geda.get_order_data_term_list()
-        with st.form(key='form-chon-cycle-mon-an'):
+        with st.form(key='form-chon-cycle-xuyen-ky'):
             col1, col2 = st.columns(2)
             with col1:
-                term = st.multiselect('Chọn kỳ', order_term_list)
+                term = st.selectbox('Chọn kỳ', order_term_list, len(order_term_list)-1)
             submitted = st.form_submit_button('Thực hiện')
+         
+        total_sale_grouping_cycle_and_dish, top_slider = geda.get_total_sale_grouping_cycle_and_dish(term)
         
-        df_order_top, top_slider = proda.top_slider(df_order, ds, de)
-        col9, col10 = st.columns(2)
-        with col9:
-            top_quantity = st.slider("Top SL:", 1, top_slider, 10)
-        with col10:
-            top_revenue = st.slider("Top Doanh thu:", 1, top_slider, 10)
-            # with col2:
-            #     top_n = st.slider("Top N:", 1, top_slider, 10)
+        col1, col2 = st.columns(2)
+        with col1:
+            top_quantity = st.slider("Top SL:", 1, top_slider, 3)
+        with col2:
+            top_revenue = st.slider("Top Doanh thu:", 1, top_slider, 3)
+            
+        top_dish_quantity, top_dish_revenue = proda.top_seller_dish_through_cycle(total_sale_grouping_cycle_and_dish, top_quantity, top_revenue)
+        col11, col12 = st.columns(2)
+        with col11:
+            st.write('Top món ăn theo số lượng bán')
+            st.table(top_dish_quantity.style.format({'SL bán': '{:,.0f}', 'Đơn giá': '{:,.0f}',
+                                            'Doanh thu': '{:,.0f}'}))
+        with col12:
+            st.write('Top món ăn theo doanh thu')
+            st.table(top_dish_revenue.style.format({'SL bán': '{:,.0f}', 'Đơn giá': '{:,.0f}',
+                                            'Doanh thu': '{:,.0f}'}))
+        

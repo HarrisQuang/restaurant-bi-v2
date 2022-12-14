@@ -428,6 +428,15 @@ def top_seller_dish(df, top_quantity, top_revenue):
     top_dish_revenue = top_dish_revenue[['Tên món', 'Đơn giá', 'SL bán', 'Doanh thu']]
     return top_dish_quantity, top_dish_revenue
 
+def top_seller_dish_through_cycle(df, top_quantity, top_revenue):
+    top_dish_quantity = df.sort_values(by='SL bán', ascending=False).head(top_quantity).reset_index(drop = True)
+    top_dish_quantity.index += 1
+    top_dish_quantity = top_dish_quantity[['Kỳ', 'Tên món', 'Đơn giá', 'Doanh thu', 'SL bán']]
+    top_dish_revenue = df.sort_values(by='Doanh thu', ascending=False).head(top_revenue).reset_index(drop = True)
+    top_dish_revenue.index += 1
+    top_dish_revenue = top_dish_revenue[['Kỳ', 'Tên món', 'Đơn giá', 'SL bán', 'Doanh thu']]
+    return top_dish_quantity, top_dish_revenue
+
 def dish_list(df):
     df = resolve_overlap_dish_remove_extra_fee(df)
     dish_list = df['Tên món'].unique().tolist()
