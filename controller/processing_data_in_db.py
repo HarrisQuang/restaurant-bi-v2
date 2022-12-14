@@ -81,20 +81,47 @@ print('Start processing data in DB')
 
 ######################################################################
 
-total_order_vegan_day = generate_total_order_vegan_day()
+# total_order_vegan_day = generate_total_order_vegan_day()
 
-engine.execute("CREATE TABLE IF NOT EXISTS total_order_vegan_day (ngay_number integer, ngay text, total_order integer, ngay_duong_number integer, ngay_duong text, ngay_am text, ngay_filter text)")
+# engine.execute("CREATE TABLE IF NOT EXISTS total_order_vegan_day (ngay_number integer, ngay text, total_order integer, ngay_duong_number integer, ngay_duong text, ngay_am text, ngay_filter text)")
+
+# root = "VALUES "
+# loop = "('%s','%s','%s', '%s','%s','%s','%s')"
+# for i in range(total_order_vegan_day.shape[0]):
+#     if i == 0:
+#         root = root + loop
+#     else:
+#         root = root + ", " + loop
+
+# ist_val = []
+# for id, row in total_order_vegan_day.iterrows():
+#     for i, val in enumerate(row):
+#         try:
+#             ist_val.append((val.strip()))
+#         except:
+#             ist_val.append(val)
+        
+# ist_val = tuple(ist_val)
+
+# query_stmnt = "INSERT INTO total_order_vegan_day (ngay_number, ngay, total_order, ngay_duong_number, ngay_duong, ngay_am, ngay_filter) " + root % ist_val
+# engine.execute(query_stmnt)
+
+################################################################
+
+total_sale_grouping_cycle_dish = generate_total_sale_grouping_cycle_and_dish()
+
+engine.execute("CREATE TABLE IF NOT EXISTS total_sale_grouping_cycle_dish (cycle text, ten_mon text, total_sl_ban float, dthu float)")
 
 root = "VALUES "
-loop = "('%s','%s','%s', '%s','%s','%s','%s')"
-for i in range(total_order_vegan_day.shape[0]):
+loop = "('%s','%s','%s','%s')"
+for i in range(total_sale_grouping_cycle_dish.shape[0]):
     if i == 0:
         root = root + loop
     else:
         root = root + ", " + loop
 
 ist_val = []
-for id, row in total_order_vegan_day.iterrows():
+for id, row in total_sale_grouping_cycle_dish.iterrows():
     for i, val in enumerate(row):
         try:
             ist_val.append((val.strip()))
@@ -103,10 +130,10 @@ for id, row in total_order_vegan_day.iterrows():
         
 ist_val = tuple(ist_val)
 
-query_stmnt = "INSERT INTO total_order_vegan_day (ngay_number, ngay, total_order, ngay_duong_number, ngay_duong, ngay_am, ngay_filter) " + root % ist_val
+query_stmnt = "INSERT INTO total_sale_grouping_cycle_dish (cycle, ten_mon, total_sl_ban, dthu) " + root % ist_val
 engine.execute(query_stmnt)
 
-################################################################
+########################################################################
 
 
 

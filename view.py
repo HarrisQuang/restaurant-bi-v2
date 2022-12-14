@@ -7,6 +7,7 @@ path = os.path.abspath('.')
 sys.path.append(path)
 import controller.processing_data as proda
 import controller.get_data as geda
+import controller.utils as utils
 
 with open('config.json', "r", encoding='utf-8') as f:
     data = json.loads(f.read())
@@ -212,93 +213,6 @@ with tab2:
         list_df_order_grouping_cycle = geda.get_statistic_dish_by_cycle_data_from_db(term, final_sltd_list)
         list_df_order_grouping_cycle = proda.markup_statistic_dish_by_cycle(list_df_order_grouping_cycle)
         
-        def get_line_chart(data, x, y, measure_delta, cate = None, sorting = False):
-            hover = alt.selection_single(
-                fields=[x],
-                nearest=True,
-                on="mouseover",
-                empty="none",
-            )
-            if cate != None:
-                if sorting == False:
-                    lines = alt.Chart(data).mark_line().encode(
-                                x = x + ':O',
-                                y = y + ':Q',
-                                color = cate + ':N',
-                                strokeDash = cate + ':N')
-                else:
-                    lines = alt.Chart(data).mark_line().encode(
-                                x = alt.X(x + ':O', sort = data[x].tolist()),
-                                y = y + ':Q',
-                                color = cate + ':N',
-                                strokeDash = cate + ':N')
-                tooltip=[
-                        alt.Tooltip(y, title=y),
-                        alt.Tooltip(x, title="Cycle"),
-                        alt.Tooltip(cate, title=cate),
-                        alt.Tooltip(measure_delta[y], title="Thay đổi")
-                    ]
-            else:
-                if sorting == False:
-                    lines = alt.Chart(data).mark_line().encode(
-                                x = x + ':O',
-                                y = y + ':Q')
-                else:
-                    lines = alt.Chart(data).mark_line().encode(
-                                x = alt.X(x + ':O', sort = data[x].tolist()),
-                                y = y + ':Q')
-                tooltip=[
-                        alt.Tooltip(y, title=y),
-                        alt.Tooltip(x, title=x),
-                        alt.Tooltip(measure_delta[y], title="Thay đổi")
-                    ]
-            points = lines.transform_filter(hover).mark_circle(size=65)
-            tooltips = (
-                alt.Chart(data)
-                .mark_rule()
-                .encode(
-                    x = alt.X(x + ':O', sort = data[x].tolist()),
-                    y=y,
-                    opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
-                    tooltip=tooltip
-                )
-                .add_selection(hover)
-            )
-            return (lines + points + tooltips).interactive()
-        
-        def get_fig4_chart(data, metric_type):
-            hover = alt.selection_single(
-                fields=["Cycle"],
-                nearest=True,
-                on="mouseover",
-                empty="none",
-            )
-            lines = alt.Chart(data).mark_line().encode(
-                        x = 'Cycle:O',
-                        y = metric_type + ':Q',
-                        color = 'Tên món:N',
-                        strokeDash='Tên món:N')
-            points = lines.transform_filter(hover).mark_circle(size=65)
-            measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
-                     'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
-            tooltips = (
-                alt.Chart(data)
-                .mark_rule()
-                .encode(
-                    x="Cycle",
-                    y=metric_type,
-                    opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
-                    tooltip=[
-                        alt.Tooltip(metric_type, title=f"{metric_type}"),
-                        alt.Tooltip('Cycle', title="Cycle"),
-                        alt.Tooltip('Tên món', title="Tên món"),
-                        alt.Tooltip(measure_delta[metric_type], title="Thay đổi")
-                    ],
-                )
-                .add_selection(hover)
-            )
-            return (lines + points + tooltips).interactive()
-        
         if len(term) == 1:
             list_df_order_grouping_cycle = proda.sort_df(list_df_order_grouping_cycle, metric_type)
             list_df_order_grouping_cycle = list_df_order_grouping_cycle[['Cycle', 'Tên món', metric_type]]
@@ -306,9 +220,9 @@ with tab2:
         else:
             measure_delta = {'Tổng SL bán': '% Tổng SL bán', 'Max SL bán': '% Max SL bán', 'Min SL bán': '% Min SL bán',
                      'Avg SL bán': '% Avg SL bán', 'Median SL bán': '% Median SL bán', 'Mode SL bán': '% Mode SL bán'}
-            fig_4 = get_line_chart(data = list_df_order_grouping_cycle, x = 'Cycle', y = metric_type, measure_delta = measure_delta, cate = 'Tên món')
+            fig_4 = utils.get_line_chart(data = list_df_order_grouping_cycle, x = 'Cycle', y = metric_type, measure_delta = measure_delta, cate = 'Tên món')
             st.altair_chart(fig_4, use_container_width=True)
-            # fig_4 = get_fig4_chart(list_df_order_grouping_cycle, metric_type)
+            # fig_4 = utils.get_fig4_chart(list_df_order_grouping_cycle, metric_type)
             # st.altair_chart(fig_4, use_container_width=True)
         
         st.markdown("### Đơn hàng ngày chay")
@@ -330,5 +244,22 @@ with tab2:
             st.table(total_order_by_day)
         else:
             measure_delta = {'Số đơn hàng': '% Số đơn hàng'}
-            fig_5 = get_line_chart(data = total_order_by_day, x = 'Ngày', y = 'Số đơn hàng', measure_delta = measure_delta, sorting = True)
+            fig_5 = utils.get_line_chart(data = total_order_by_day, x = 'Ngày', y = 'Số đơn hàng', measure_delta = measure_delta, sorting = True)
             st.altair_chart(fig_5, use_container_width=True)
+        
+        st.markdown("### Món bán chạy")
+        order_term_list = geda.get_order_data_term_list()
+        with st.form(key='form-chon-cycle-mon-an'):
+            col1, col2 = st.columns(2)
+            with col1:
+                term = st.multiselect('Chọn kỳ', order_term_list)
+            submitted = st.form_submit_button('Thực hiện')
+        
+        df_order_top, top_slider = proda.top_slider(df_order, ds, de)
+        col9, col10 = st.columns(2)
+        with col9:
+            top_quantity = st.slider("Top SL:", 1, top_slider, 10)
+        with col10:
+            top_revenue = st.slider("Top Doanh thu:", 1, top_slider, 10)
+            # with col2:
+            #     top_n = st.slider("Top N:", 1, top_slider, 10)
