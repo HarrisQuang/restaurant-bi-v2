@@ -50,16 +50,16 @@ def resolve_various_dish_name(df):
     df['Tên món'] = df['Tên món'].str.strip()
     vro_dish_name = data['various_dish_name']
     for key in vro_dish_name.keys():
-        old_val = replace_double_quote(key)
-        new_val = replace_double_quote(vro_dish_name[key])
+        old_val = replace_by_double_quote(key)
+        new_val = replace_by_double_quote(vro_dish_name[key])
         df['Tên món'].replace(old_val, new_val, inplace=True)
     return df
 
 def create_mask_dish_name(df):
     df['Tên món'] = df['Tên món'].str.strip()
     for key in msk_dish_name.keys():
-        old_val = replace_double_quote(key)
-        new_val = replace_double_quote(msk_dish_name[key])
+        old_val = replace_by_double_quote(key)
+        new_val = replace_by_double_quote(msk_dish_name[key])
         df['Tên món'].replace(old_val, new_val, inplace=True)
     return df
 

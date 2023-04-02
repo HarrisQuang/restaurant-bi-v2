@@ -103,7 +103,7 @@ def get_vegan_day_data():
     return df
 
 def get_existing_vegan_day():
-    result = engine.execute("SELECT ngay_filter FROM total_order_vegan_day")
+    result = engine.execute("SELECT ngay_filter FROM orders_vegan_day")
     df = pd.DataFrame(result.fetchall())
     result = df['ngay_filter'].tolist()
     return result
@@ -111,9 +111,9 @@ def get_existing_vegan_day():
 def get_total_order_by_day(day_list):
     day_list = tuple(day_list)
     if len(day_list) == 1:
-        result = engine.execute("SELECT ngay_number, ngay_filter, total_order FROM total_order_vegan_day where ngay_filter = '%s'" % (day_list[0]))
+        result = engine.execute("SELECT ngay_number, ngay_filter, total_order FROM orders_vegan_day where ngay_filter = '%s'" % (day_list[0]))
     else:
-        result = engine.execute("SELECT ngay_number, ngay_filter, total_order FROM total_order_vegan_day where ngay_filter in %s" % (day_list,))
+        result = engine.execute("SELECT ngay_number, ngay_filter, total_order FROM orders_vegan_day where ngay_filter in %s" % (day_list,))
     df = pd.DataFrame(result.fetchall())
     df = df.sort_values(by = 'ngay_number', ascending = True)
     df = df[['ngay_filter', 'total_order']]

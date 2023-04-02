@@ -21,8 +21,8 @@ print('Start processing data in DB')
 
 # engine.execute("CREATE TABLE IF NOT EXISTS resolve_overlap_dish_remove_extra_fee (ngay text, cycle text, ma_mon text, ten_mon text, sl_ban real, doanh_thu real, don_gia real, ngay_number integer)")
 
-# order_data = get_order_data_from_db()
-# tuning_order_data = resolve_overlap_dish_remove_extra_fee(order_data)
+order_data = get_order_data_from_db()
+tuning_order_data = resolve_overlap_dish_remove_extra_fee(order_data)
 # tuning_order_data = tuning_order_data.iloc[:2]
 
 # Transfrom data in staging
@@ -81,7 +81,7 @@ print('Start processing data in DB')
 
 ######################################################################
 
-# total_order_vegan_day = generate_total_order_vegan_day()
+total_order_vegan_day = generate_total_order_vegan_day()
 
 # engine.execute("CREATE TABLE IF NOT EXISTS total_order_vegan_day (ngay_number integer, ngay text, total_order integer, ngay_duong_number integer, ngay_duong text, ngay_am text, ngay_filter text)")
 

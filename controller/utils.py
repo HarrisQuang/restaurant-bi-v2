@@ -14,7 +14,7 @@ def transform_col(sr):
     sr = sr.apply(lambda x: rreplace(x, '.', '', x.count('.')))
     return sr
 
-def replace_double_quote(str):
+def replace_by_double_quote(str):
     str = rreplace(str, "'", '"', str.count("'"))
     return str
 
